@@ -23,7 +23,7 @@
         }
         .input-field {
             border: 1px solid #ccc;
-            border-radius: 10px;
+            border-radius: 16px;
             padding: 12px 14px;
             width: 100%;
             outline: none;

@@ -4,10 +4,15 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\LoginController;
 
-// halaman home/homepage
+// halaman home/landing page tanpa akun
 Route::get('/', function () {
-    return view('homepage');
-})->name('home');
+    return view('landingpage');
+})->name('landingpage');
+
+// halaman home/landing page dengan akun
+Route::get('/landingpage2', function () {
+    return view('landingpage2');
+})->name('landingpage2');
 
 // halaman register
 Route::get('/register', [RegisterController::class, 'showRegisterForm'])->name('register');
