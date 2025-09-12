@@ -9,10 +9,10 @@ Route::get('/', function () {
     return view('landingpage');
 })->name('landingpage');
 
-// halaman home/landing page dengan akun
+// halaman home/landing page dengan akun (protected route - requires authentication)
 Route::get('/landingpage2', function () {
     return view('landingpage2');
-})->name('landingpage2');
+})->middleware(['auth'])->name('landingpage2');
 
 // halaman register
 Route::get('/register', [RegisterController::class, 'showRegisterForm'])->name('register');

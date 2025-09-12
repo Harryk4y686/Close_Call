@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Pengguna;
+use Illuminate\Support\Facades\Auth;
+
 
 class RegisterController extends Controller
 {
@@ -35,8 +37,8 @@ class RegisterController extends Controller
                 'password' => bcrypt($request->password), // hash password for security
             ]);
 
-            // redirect kembali dengan pesan sukses
-            return redirect('/login')->with('success', 'Akun berhasil dibuat!');
+            // redirect ke halaman dengan pesan sukses
+            return redirect()->route('login')->with('success', 'Registrasi berhasil! Silakan login dengan akun Anda.');
         } catch (\Exception $e) {
             // Show the actual error for debugging
             return redirect()->back()

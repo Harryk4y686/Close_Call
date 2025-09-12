@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Pengguna;
 
 class LoginController extends Controller
@@ -21,20 +21,14 @@ class LoginController extends Controller
             'password' => 'required',
         ]);
 
-        // cari user berdasarkan email di tabel pengguna
-        $pengguna = Pengguna::where('email', $request->email)->first();
+        // attempt login with Laravel's authentication
+        $credentials = $request->only('email', 'password');
 
-        // cek apakah user ada dan password cocok
-        if ($pengguna && Hash::check($request->password, $pengguna->password)) {
-            // simpan data user ke session
-            session([
-                'user_id' => $pengguna->id,
-                'user_name' => $pengguna->fisrt_name . ' ' . $pengguna->last_name,
-                'user_email' => $pengguna->email,
-            ]);
+        if (Auth::attempt($credentials)) {
+            $user = Auth::user();
 
-            // redirect ke homepage dengan pesan sukses
-            return redirect('/')->with('success', 'Login berhasil! Selamat datang ' . $pengguna->fisrt_name);
+            return redirect()->route('landingpage2')
+                ->with('success', 'Login berhasil! Selamat datang ' . $user->fisrt_name);
         }
 
         // kalau gagal → balik ke login dengan error
@@ -45,8 +39,8 @@ class LoginController extends Controller
 
     public function logout(Request $request)
     {
-        // hapus session user
-        $request->session()->forget(['user_id', 'user_name', 'user_email']);
+        Auth::logout();
+        
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
