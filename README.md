@@ -53,7 +53,7 @@ Setelah menekan tombol Verify your Email, user akan diarahkan ke halaman landing
 - Pada bagian Browse Jobs, masing-masing pilihan dapat diklik untuk melihat informasi lebih detail, namun halaman khusus untuk melihat detail informasinya masih dalam proses pembuatan
 - Kemudian terdapat fitur CloseCall AI, dengan CloseCall AI, kita mendapatkan asisten karier cerdas yang membantu membuat resume profesional dan mempersiapkan lamaran kerja lebih mudah dari sebelumnya untuk mendapatkan pekerjaan impian (fitur ini masih belum dapat digunakan untuk sementara)
 ### IMPORTANT!
-Sementara waktu, landing page yang digunakan adalah landing page yang belum login oleh user
+Sementara waktu, landing page yang digunakan adalah landing page yang belum login oleh user. Untuk landing page 2 khusus untuk yang sudah login namun untuk landing page 2 tidak digunakan untuk sementara dikarenakan memerlukan verifikasi email
 
 ## 👥 Contributors
 ### Fidelyn Adeo Gratia - UI/UX Designer
