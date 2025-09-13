@@ -1,4 +1,4 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+<p align="center"><a href="https://laravel.com" target="_blank"><img src="public/image/logo.png" width="200" alt="Laravel Logo"></a></p>
 
 <p align="center">
 <a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
@@ -11,43 +11,43 @@
 
 Close Call adalah website untuk mencari berbagai lowongan pekerjaan
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Fungsi nya adalah:
+- Menyediakan satu platform terpusat untuk semua informasi lowongan kerja
+- Mempermudah pencari kerja menemukan pekerjaan sesuai minat, lokasi, dan kualifikasi
+- Mempercepat proses pencocokan antara perusahaan dan kandidat
+- Menyediakan komunikasi langsung antara pencari kerja dan perusahaan
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Aplikasi yang akan dibangun merupakan platform pencarian kerja yang mempertemukan pencari kerja dan pemberi kerja secara lebih cepat, dekat, dan efektif. Bagi pencari kerja, aplikasi ini menyediakan fitur rekomendasi lowongan berbasis AI, panduan pembuatan kalender, serta informasi mengenai keterampilan yang dibutuhkan sesuai lokasi lowongan kerja yang dekat. Sementara itu, bagi pemberi kerja, aplikasi ini menawarkan proses rekrutmen yang lebih efisien untuk UMKM rendah dengan melalui fitur pencocokan berbasis AI serta menyediakan tempat untuk melakukan komunikasi lebih lanjut , sehingga aplikasi ini dapat menjadi solusi menyeluruh untuk mengatasi tantangan dalam mencegah pengganguran kerja dan startup atau UMKM yang rendah
 
-## Learning Laravel
+## Fitur Utama
+- Pencarian lowongan kerja sesuai lokasi
+- Fitur untuk melihat berbagai event
+- AI spesifik ke pencarian lowongan kerja/membantu rekomendasikan orang ke tempat loker
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Teknologi yang digunakan dalam pengembangan dan pembuatan aplikasi Close Call meliputi:
+- Figma sebagai platform utama desain UI/UX.
+- MySQL untuk basis data aplikasi CloseCall.
+- GitHub sebagai tempat repositori kode.
+- Laravel sebagai framework backend.
+- Tailwind CSS sebagai framework frontend.
+- Git untuk kolaborasi pengembangan.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## Penjelasan lebih lengkap tentang fitur:
+### Halaman Login
+Terdapat kolom input email or phone untuk memasukkan email dan terdapat kolom input password untuk memasukkan password.
+Kemudian terdapat tombol login untuk konfirmasi menggunakan akun tersebut dan juga tombol Sign up bagi yang belum memiliki akun yang akan mengarahkan user ke halaman registrasi
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Halaman Register
+- Terdapat kolom input first name untuk memasukkan nama depan
+- Terdapat kolom input last name untuk memasukkan namma akhir
+- Terdapat kolom input email or phone untuk memasukkan email
+- Terdapat kolom input country untuk memasukkan negara
+- Terdapat kolom input password untuk memasukkan password untuk akun tersebut serta
+- Terdapat kolom input password verify untuk memasukkan konfirmasi password
+- Terdapat tombol Register untuk konfirmasi setelah itu user akan diarahkan untuk memasukkan kode yang telah diberikan melalui email (Verify your Email)
+- Terdapat tombol Login jika telah memiliki akun
 
-## Laravel Sponsors
-
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+Setelah menekan tombol Verify your Email, user akan diarahkan ke halaman landing page yang telah diverifikasi mempunyai akun
 
 ## Contributing
 
