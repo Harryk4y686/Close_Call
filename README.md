@@ -39,7 +39,7 @@ Kemudian terdapat tombol login untuk konfirmasi menggunakan akun tersebut dan ju
 
 ### Halaman Register
 - Terdapat kolom input first name untuk memasukkan nama depan
-- Terdapat kolom input last name untuk memasukkan namma akhir
+- Terdapat kolom input last name untuk memasukkan nama akhir
 - Terdapat kolom input email or phone untuk memasukkan email
 - Terdapat kolom input country untuk memasukkan negara
 - Terdapat kolom input password untuk memasukkan password untuk akun tersebut serta
