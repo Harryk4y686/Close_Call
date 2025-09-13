@@ -55,10 +55,16 @@ Setelah menekan tombol Verify your Email, user akan diarahkan ke halaman landing
 ### IMPORTANT!
 Sementara waktu, landing page yang digunakan adalah landing page yang belum login oleh user
 
-## Code of Conduct
+## 👥 Contributors
+### Fidelyn Adeo Gratia - UI/UX Designer
+### Grant Savero - BackEnd Developer
+### Surya Gemilang Pratama - FrontEnd Developer
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## License
+## Struktur
+- public/image > Aset-aset foto
+- resources/views > Blade, Tailwind, CSS, JavaScript
+- routes > Routing
+- README.md > Dokumentasi Aplikasi
+- ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
