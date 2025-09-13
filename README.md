@@ -46,20 +46,18 @@ Kemudian terdapat tombol login untuk konfirmasi menggunakan akun tersebut dan ju
 - Terdapat kolom input password verify untuk memasukkan konfirmasi password
 - Terdapat tombol Register untuk konfirmasi setelah itu user akan diarahkan untuk memasukkan kode yang telah diberikan melalui email (Verify your Email)
 - Terdapat tombol Login jika telah memiliki akun
-
 Setelah menekan tombol Verify your Email, user akan diarahkan ke halaman landing page yang telah diverifikasi mempunyai akun
 
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Landing Page
+- Terdapat Job Categories, Browse Jobs, Reviews, CloseCall AI, Join us (untuk yang belum login), dan berbagai pilihan di bagian footer
+- Pada bagian Browse Jobs, masing-masing pilihan dapat diklik untuk melihat informasi lebih detail, namun halaman khusus untuk melihat detail informasinya masih dalam proses pembuatan
+- Kemudian terdapat fitur CloseCall AI, dengan CloseCall AI, kita mendapatkan asisten karier cerdas yang membantu membuat resume profesional dan mempersiapkan lamaran kerja lebih mudah dari sebelumnya untuk mendapatkan pekerjaan impian (fitur ini masih belum dapat digunakan untuk sementara)
+### IMPORTANT!
+Sementara waktu, landing page yang digunakan adalah landing page yang belum login oleh user
 
 ## Code of Conduct
 
 In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
 ## License
 
