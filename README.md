@@ -65,6 +65,3 @@ Sementara waktu, landing page yang digunakan adalah landing page yang belum logi
 - resources/views > Blade, Tailwind, CSS, JavaScript
 - routes > Routing
 - README.md > Dokumentasi Aplikasi
-- ## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
