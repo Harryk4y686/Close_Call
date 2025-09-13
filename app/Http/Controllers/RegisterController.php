@@ -37,8 +37,9 @@ class RegisterController extends Controller
                 'password' => bcrypt($request->password), // hash password for security
             ]);
 
-            // redirect ke halaman dengan pesan sukses
-            return redirect()->route('login')->with('success', 'Registrasi berhasil! Silakan login dengan akun Anda.');
+            // Login the user and redirect to email verification
+            Auth::login($pengguna);
+            return redirect()->route('verification.notice');
         } catch (\Exception $e) {
             // Show the actual error for debugging
             return redirect()->back()

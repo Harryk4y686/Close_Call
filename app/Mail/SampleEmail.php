@@ -37,7 +37,7 @@ class SampleEmail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.sample',
+            view: 'emails.tese',
         );
     }
 

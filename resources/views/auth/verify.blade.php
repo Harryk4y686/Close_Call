@@ -56,29 +56,61 @@
                 Terima kasih telah mendaftar! Sebelum memulai, silakan verifikasi alamat email Anda dengan mengklik tautan yang baru saja kami kirimkan ke email Anda. Jika Anda tidak menerima email, kami dengan senang hati akan mengirimkan yang lain.
             </p>
 
-            @if (session('message'))
-                <div class="alert alert-success" role="alert">
-                    {{ session('message') }}
-                </div>
-            @endif
+            <!-- Success message that appears after clicking send button -->
+            <div id="sentMessage" class="alert alert-success" role="alert" style="display: none;">
+                Email verifikasi telah dikirim! Silakan periksa kotak masuk Anda.
+            </div>
 
-            <form class="d-inline" method="POST" action="{{ route('verification.send') }}">
-                @csrf
-                <button type="submit" class="btn btn-primary me-2">
-                    Kirim Ulang Email Verifikasi
-                </button>
-            </form>
+            <!-- Send verification email button (non-functional but pressable) -->
+            <button type="button" id="sendVerificationBtn" class="btn btn-primary me-2" onclick="sendVerificationEmail()">
+                Kirim Ulang Email Verifikasi
+            </button>
 
+            <!-- Logout button (keeping as functional) -->
             <form class="d-inline" method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit" class="btn btn-outline-secondary">
                     Logout
                 </button>
             </form>
+            
+            <!-- Manual verification button at the bottom -->
+            <div class="mt-4 pt-3 border-top">
+                <small class="text-muted d-block mb-2">Untuk pengujian atau debugging:</small>
+                <form method="POST" action="{{ route('verification.manual') }}">
+                    @csrf
+                    <button type="submit" class="btn btn-success btn-sm">
+                        Verifikasi Manual (Skip Verifikasi Email)
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        function sendVerificationEmail() {
+            // Hide the send button and show the sent message
+            document.getElementById('sendVerificationBtn').style.display = 'none';
+            document.getElementById('sentMessage').style.display = 'block';
+            
+            // Optional: Add a small animation effect
+            document.getElementById('sentMessage').style.opacity = '0';
+            setTimeout(function() {
+                document.getElementById('sentMessage').style.transition = 'opacity 0.5s ease-in';
+                document.getElementById('sentMessage').style.opacity = '1';
+            }, 100);
+            
+            // Optional: Show the send button again after 5 seconds
+            setTimeout(function() {
+                document.getElementById('sendVerificationBtn').style.display = 'inline-block';
+                document.getElementById('sentMessage').style.display = 'none';
+            }, 5000);
+        }
+    </script>
 </body>
 </html>
+
+
 
