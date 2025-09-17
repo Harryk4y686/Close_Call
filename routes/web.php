@@ -49,11 +49,11 @@ Route::middleware('auth')->group(function () {
         return back()->with('message', 'Verification link sent!');
     })->middleware(['throttle:6,1'])->name('verification.send');
 });
-Auth::routes(['verify' => true]);
+// Auth::routes(['verify' => true]);
 
-Route::get('/login', [LoginController::class, 'index'])
-    ->middleware(['auth', 'verified'])
-    ->name('home');
+// Route::get('/login', [LoginController::class, 'index'])
+//     ->middleware(['auth', 'verified'])
+//     ->name('login');
 
 
 // Manual email verification route
@@ -61,12 +61,12 @@ Route::post('/email/manual-verify', [EmailVerificationController::class, 'manual
     ->middleware('auth')
     ->name('verification.manual');
 
-    use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Mail;
 
 Route::get('/test-email', function () {
     Mail::raw('This is a test email from Laravel.', function ($message) {
         $message->to('your-real-email@gmail.com')
-                ->subject('Test Email');
+            ->subject('Test Email');
     });
 
     return 'Email sent!';
