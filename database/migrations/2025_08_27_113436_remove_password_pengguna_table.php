@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('pengguna', function (Blueprint $table) {
             if(Schema::hasColumn('pengguna', 'password')){
-                           $table->integer('phone_number');
+                $table->integer('phone_number');
             }
         });
     }
