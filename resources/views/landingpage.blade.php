@@ -70,10 +70,29 @@
         
         /* Header Navigation */
         .header {
-            background: url('/image/headerbg.png') no-repeat center center;
-            background-size: cover;
             padding: 60px 0 120px;
             position: relative;
+            overflow: hidden;
+        }
+        
+        .header-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+        }
+        
+        .header-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            z-index: 0;
         }
         
         .navigation {
@@ -743,6 +762,10 @@
         
         /* Responsive */
         @media (max-width: 768px) {
+            .header-video {
+                object-position: center center;
+            }
+            
             .hero-title {
                 font-size: 36px;
             }
@@ -949,7 +972,12 @@
 <body class="bg-white text-black leading-6 font-poppins">
     <!-- Header Section -->
     <div class="header">
-        <div class="container w-full max-w-6xl mx-auto px-5">
+        <video class="header-video" autoplay muted loop playsinline>
+            <source src="{{ asset('image/landingpage.mp4') }}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <div class="header-overlay"></div>
+        <div class="container w-full max-w-6xl mx-auto px-5" style="position: relative; z-index: 1;">
             <nav class="navigation flex justify-end items-center mb-20 scroll-animate scroll-animate-up">
                 <a href="#" class="nav-link">Home</a>
                 <a href="#" class="nav-link">Browse Jobs</a>
