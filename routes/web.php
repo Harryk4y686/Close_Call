@@ -16,8 +16,38 @@ Route::get('/', function () {
 
 // halaman home/landing page dengan akun (protected route - requires authentication)
 Route::get('/landingpage2', function () {
-    return view('landingpage2');
+    return view('landing-page');
 })->middleware(['auth'])->name('landingpage2');
+
+// (testing) halaman profile
+Route::get('/profile', function () {
+    return view('profile');
+})->name('profile');
+
+// (testing) halaman jobs
+Route::get('/jobs', function () {
+    return view('jobs');
+})->name('jobs');
+
+// (testing) halaman events
+Route::get('/events', function () {
+    return view('events');
+})->name('events');
+
+// (testing) halaman chats
+Route::get('/chats', function () {
+    return view('chats');
+})->name('chats');
+
+// (testing) halaman opened job (best partner job)
+Route::get('/genius', function () {
+    return view('genius');
+})->name('genius');
+
+// (testing) halaman opened job (best partner job)
+Route::get('/bestpartnerjob', function () {
+    return view('bestpartnerjob');
+})->name('bestpartnerjob');
 
 // halaman register
 Route::get('/register', [RegisterController::class, 'showRegisterForm'])->name('register');
@@ -60,6 +90,11 @@ Route::middleware('auth')->group(function () {
 Route::post('/email/manual-verify', [EmailVerificationController::class, 'manualVerify'])
     ->middleware('auth')
     ->name('verification.manual');
+
+// Handle verification code submission
+Route::post('/email/verify-code', [EmailVerificationController::class, 'verifyCode'])
+    ->middleware('auth')
+    ->name('verification.code');
 
 use Illuminate\Support\Facades\Mail;
 
