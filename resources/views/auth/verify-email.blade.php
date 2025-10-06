@@ -61,10 +61,15 @@
                 Email verifikasi telah dikirim! Silakan periksa kotak masuk Anda.
             </div>
 
+            <form method="POST" action="{{ route('verification.resend') }}">
+                    @csrf
+                    <input type="email" name="email" placeholder="Enter your email" class="form-control mb-3" required>
+                    <button type="submit" class="btn btn-primary me-2">
+                        Kirim Ulang Email Verifikasi
+                    </button>
+                </form>
             <!-- Send verification email button (non-functional but pressable) -->
-            <button type="button" id="sendVerificationBtn" class="btn btn-primary me-2" onclick="sendVerificationEmail()">
-                Kirim Ulang Email Verifikasi
-            </button>
+    
 
             <!-- Logout button (keeping as functional) -->
             <form class="d-inline" method="POST" action="{{ route('logout') }}">

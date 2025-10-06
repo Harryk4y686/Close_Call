@@ -1238,7 +1238,7 @@
             <p class="cta-description scroll-animate scroll-animate-up delay-300">"Join CloseCall today and start exploring tailored opportunities that match your skills and goals! We'll help you land the dream job you've been searching for."</p>
             
             <div class="cta-buttons">
-                <a href="#" class="cta-button scroll-animate scroll-animate-up delay-400">Register</a>
+                <a href="/register" class="cta-button scroll-animate scroll-animate-up delay-400">Register</a>
                 <a href="#" class="cta-button secondary scroll-animate scroll-animate-up delay-500">Login</a>
             </div>
         </div>

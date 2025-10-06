@@ -12,10 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('pengguna', function (Blueprint $table) {
-            // Password column is needed for authentication, so not removing it
-            // if(Schema::hasColumn('pengguna', 'password')){
-            //     $table->dropColumn('password');
-            // }
+            $table->dropColumn('email_verified_at');
         });
     }
 
@@ -25,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('pengguna', function (Blueprint $table) {
-            // No need to add password back since we're not removing it
+            $table->timestamp('email_verified_at')->nullable();
         });
     }
 };

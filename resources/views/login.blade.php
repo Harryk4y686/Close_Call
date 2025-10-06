@@ -92,6 +92,13 @@
                 </div>
             @endif
 
+            <!-- Display Info Message -->
+            @if (session('info'))
+                <div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded mb-4">
+                    {{ session('info') }}
+                </div>
+            @endif
+
             <form action="{{ route('login.post') }}" method="POST" class="space-y-4">
                 @csrf
                 <input type="email" name="email" placeholder="Email" class="input-field" value="{{ old('email') }}" required>

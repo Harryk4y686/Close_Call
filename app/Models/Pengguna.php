@@ -15,12 +15,13 @@ class Pengguna extends Authenticatable implements MustVerifyEmail
     protected $table = 'pengguna';
 
     protected $fillable = [
-        'fisrt_name',  // matches the actual column name in database
+        'first_name',
         'last_name',
         'email',
         'password',
         'country',
         'phone_number',
+        'verified',
     ];
 
     protected $hidden = [
@@ -29,7 +30,12 @@ class Pengguna extends Authenticatable implements MustVerifyEmail
     ];
 
     protected $casts = [
-        'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'verified' => 'boolean',
     ];
+
+    public function emailVerifications()
+    {
+        return $this->hasMany(EmailVerification::class, 'user_id');
+    }
 }
