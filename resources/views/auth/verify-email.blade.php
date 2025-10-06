@@ -3,119 +3,196 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verifikasi Email - Close Call</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Verify your Email - CloseCall</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background: linear-gradient(to right, #b2f5ea, #81e6d9, #38b2ac);
+            font-family: 'Inter', sans-serif;
         }
-        .verify-card {
-            max-width: 500px;
+        .verification-container {
             background: white;
-            border-radius: 15px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 500px;
+            margin: 0 auto;
         }
-        .verify-icon {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1.5rem;
+        .code-input {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            background-color: #f7fafc;
+            text-align: center;
+            font-size: 24px;
+            font-weight: 600;
+            outline: none;
+            transition: all 0.2s;
         }
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        .code-input:focus {
+            border-color: #38b2ac;
+            background-color: white;
+            box-shadow: 0 0 0 3px rgba(56, 178, 172, 0.1);
+        }
+        .verify-btn {
+            background: #009688;
+            color: white;
+            padding: 14px 40px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 16px;
             border: none;
-            padding: 12px 30px;
-            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            max-width: 200px;
         }
-        .btn-primary:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
+        .verify-btn:hover {
+            background: #00796b;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(0, 150, 136, 0.3);
+        }
+        .verify-btn:active {
+            transform: translateY(0);
+        }
+        .manual-verify-btn {
+            background: #28a745;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .manual-verify-btn:hover {
+            background: #218838;
         }
     </style>
 </head>
-<body>
-    <div class="verify-card">
-        <div class="verify-icon">
-            <svg width="40" height="40" fill="white" viewBox="0 0 16 16">
-                <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 14H2a2 2 0 0 1-2-2V4zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2zm13 2.383-4.708 2.825L15 11.105V5.383zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741zM1 11.105l4.708-2.897L1 5.383v5.722z"/>
-            </svg>
+<body class="flex items-center justify-center min-h-screen">
+    
+    <div class="verification-container">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-4">Verify your Email!</h1>
+            <p class="text-gray-600 text-base leading-relaxed">
+                Account activation code has been sent to the address you provided. Please input the code here.
+            </p>
         </div>
-        
-        <div class="text-center">
-            <h2 class="h4 mb-3">Verifikasi Email Anda</h2>
-            <p class="text-muted mb-4">
-                Terima kasih telah mendaftar! Sebelum memulai, silakan verifikasi alamat email Anda dengan mengklik tautan yang baru saja kami kirimkan ke email Anda. Jika Anda tidak menerima email, kami dengan senang hati akan mengirimkan yang lain.
+
+        <!-- Display Success/Error Messages -->
+        @if (session('success'))
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 text-center">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        @if (session('error'))
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-center">
+                {{ session('error') }}
+            </div>
+        @endif
+
+        @if ($errors->any())
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                @foreach ($errors->all() as $error)
+                    <p class="text-center">{{ $error }}</p>
+                @endforeach
+            </div>
+        @endif
+
+        <!-- Verification Code Form -->
+        <form method="POST" action="{{ route('verification.code') }}" class="text-center">
+            @csrf
+            
+            <!-- Code Input Fields -->
+            <div class="flex justify-center space-x-3 mb-8">
+                <input type="text" name="code1" class="code-input" maxlength="1" onkeyup="moveToNext(this, 'code2')" onkeydown="moveToPrev(this, event)" required>
+                <input type="text" name="code2" class="code-input" maxlength="1" onkeyup="moveToNext(this, 'code3')" onkeydown="moveToPrev(this, event, 'code1')" required>
+                <input type="text" name="code3" class="code-input" maxlength="1" onkeyup="moveToNext(this, 'code4')" onkeydown="moveToPrev(this, event, 'code2')" required>
+                <input type="text" name="code4" class="code-input" maxlength="1" onkeyup="moveToNext(this, 'code5')" onkeydown="moveToPrev(this, event, 'code3')" required>
+                <input type="text" name="code5" class="code-input" maxlength="1" onkeydown="moveToPrev(this, event, 'code4')" required>
+            </div>
+
+            <!-- Verify Button -->
+            <button type="submit" class="verify-btn mx-auto">
+                Verify
+            </button>
+        </form>
+
+        <!-- Alternative Actions -->
+        <div class="mt-8 text-center">
+            <p class="text-gray-500 text-sm mb-4">
+                Didn't receive the code? 
+                <a href="#" class="text-teal-600 hover:text-teal-700 font-medium" onclick="resendCode()">Resend</a>
             </p>
 
-            <!-- Success message that appears after clicking send button -->
-            <div id="sentMessage" class="alert alert-success" role="alert" style="display: none;">
-                Email verifikasi telah dikirim! Silakan periksa kotak masuk Anda.
-            </div>
-
-            <form method="POST" action="{{ route('verification.resend') }}">
-                    @csrf
-                    <input type="email" name="email" placeholder="Enter your email" class="form-control mb-3" required>
-                    <button type="submit" class="btn btn-primary me-2">
-                        Kirim Ulang Email Verifikasi
-                    </button>
-                </form>
-            <!-- Send verification email button (non-functional but pressable) -->
-    
-
-            <!-- Logout button (keeping as functional) -->
-            <form class="d-inline" method="POST" action="{{ route('logout') }}">
+            <!-- Logout option -->
+            <form method="POST" action="{{ route('logout') }}" class="inline-block">
                 @csrf
-                <button type="submit" class="btn btn-outline-secondary">
-                    Logout
+                <button type="submit" class="text-gray-400 hover:text-gray-600 text-sm underline">
+                    Use different account
                 </button>
             </form>
-            
-            <!-- Manual verification button at the bottom -->
-            <div class="mt-4 pt-3 border-top">
-                <small class="text-muted d-block mb-2">Untuk pengujian atau debugging:</small>
-                <form method="POST" action="{{ route('verification.manual') }}">
-                    @csrf
-                    <button type="submit" class="btn btn-success btn-sm">
-                        Verifikasi Manual (Skip Verifikasi Email)
-                    </button>
-                </form>
-            </div>
+        </div>
+
+        <!-- Manual verification for testing (hidden by default) -->
+        <div class="mt-6 pt-4 border-t border-gray-200 text-center" style="display: none;" id="debug-section">
+            <small class="text-gray-400 block mb-2">For testing purposes:</small>
+            <form method="POST" action="{{ route('verification.manual') }}" class="inline-block">
+                @csrf
+                <button type="submit" class="manual-verify-btn">
+                    Skip Verification
+                </button>
+            </form>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    
     <script>
-        function sendVerificationEmail() {
-            // Hide the send button and show the sent message
-            document.getElementById('sendVerificationBtn').style.display = 'none';
-            document.getElementById('sentMessage').style.display = 'block';
-            
-            // Optional: Add a small animation effect
-            document.getElementById('sentMessage').style.opacity = '0';
-            setTimeout(function() {
-                document.getElementById('sentMessage').style.transition = 'opacity 0.5s ease-in';
-                document.getElementById('sentMessage').style.opacity = '1';
-            }, 100);
-            
-            // Optional: Show the send button again after 5 seconds
-            setTimeout(function() {
-                document.getElementById('sendVerificationBtn').style.display = 'inline-block';
-                document.getElementById('sentMessage').style.display = 'none';
-            }, 5000);
+        // Show debug section if in development environment
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            document.getElementById('debug-section').style.display = 'block';
         }
+
+        // Auto focus and move to next input
+        function moveToNext(current, nextFieldId) {
+            if (current.value.length === 1) {
+                const nextField = document.getElementsByName(nextFieldId)[0];
+                if (nextField) {
+                    nextField.focus();
+                }
+            }
+        }
+
+        // Handle backspace to move to previous field
+        function moveToPrev(current, event, prevFieldId) {
+            if (event.key === 'Backspace' && current.value.length === 0 && prevFieldId) {
+                const prevField = document.getElementsByName(prevFieldId)[0];
+                if (prevField) {
+                    prevField.focus();
+                }
+            }
+        }
+
+        // Resend code functionality
+        function resendCode() {
+            // Here you could implement actual resend logic
+            alert('Verification code sent! Please check your email.');
+        }
+
+        // Focus first input on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementsByName('code1')[0].focus();
+        });
+
+        // Only allow numeric input
+        document.querySelectorAll('.code-input').forEach(input => {
+            input.addEventListener('input', function(e) {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+        });
     </script>
 </body>
 </html>
-
-
-

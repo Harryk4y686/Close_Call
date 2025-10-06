@@ -7,8 +7,30 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
-            background: linear-gradient(to right, #b2f5ea, #81e6d9, #38b2ac);
             font-family: 'Inter', sans-serif;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            object-fit: cover;
+            object-position: center center;
+        }
+        
+        .video-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.1);
+            z-index: -1;
         }
         .card {
             background: white;
@@ -18,7 +40,7 @@
             height: 1000px;
         }
         .left-side {
-            background: url('/image/background.png') no-repeat center center;
+            background: url('/image/background.png');
             background-size:cover;
         }
         .input-field {
@@ -56,9 +78,32 @@
         .social-btn:hover {
             transform: translateY(-2px);
         }
+        
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            body {
+                overflow-y: auto;
+                overflow-x: hidden;
+            }
+            
+            .video-background {
+                object-position: center center;
+                /* Alternative for better fit: object-fit: contain; */
+            }
+            
+            .card {
+                height: auto;
+                min-height: 100vh;
+            }
+        }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen">
+    <video class="video-background" autoplay muted loop playsinline>
+        <source src="{{ asset('image/loginsignup.mp4') }}" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    <div class="video-overlay"></div>
 
     <div class="card w-10/12 lg:w-8/12 grid grid-cols-1 lg:grid-cols-2">
         <!-- Left Side -->

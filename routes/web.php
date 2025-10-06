@@ -20,7 +20,7 @@ Route::get('/', function () {
 // halaman home/landing page dengan akun (protected route - requires authentication and verification)
 Route::get('/landingpage2', function () {
     return view('landingpage2');
-})->middleware(['auth', 'email.verified'])->name('landingpage2');
+})->middleware(['auth'])->name('landingpage2');
 
 // halaman register
 Route::get('/register', [UserRegistrationController::class, 'showRegistrationForm'])->name('register');
@@ -63,6 +63,11 @@ Route::middleware('auth')->group(function () {
 Route::post('/email/manual-verify', [EmailVerificationController::class, 'manualVerify'])
     ->middleware('auth')
     ->name('verification.manual');
+
+// Handle verification code submission
+Route::post('/email/verify-code', [EmailVerificationController::class, 'verifyCode'])
+    ->middleware('auth')
+    ->name('verification.code');
 
 use Illuminate\Support\Facades\Mail;
 
