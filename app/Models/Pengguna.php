@@ -38,4 +38,12 @@ class Pengguna extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(EmailVerification::class, 'user_id');
     }
+
+    /**
+     * Get the registered profile for the pengguna.
+     */
+    public function registeredProfile()
+    {
+        return $this->hasOne(PenggunaRegistered::class, 'pengguna_id');
+    }
 }

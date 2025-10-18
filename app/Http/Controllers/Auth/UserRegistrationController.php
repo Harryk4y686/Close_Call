@@ -25,7 +25,7 @@ class UserRegistrationController extends Controller
             'name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:pengguna',
-            'phone_number' => 'required|string|max:20',
+            'phone_number' => 'required|string|max:20|unique:pengguna',
             'country' => 'required|string|max:255',
             'password' => 'required|string|min:8|confirmed',
         ]);

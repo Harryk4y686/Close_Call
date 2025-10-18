@@ -43,8 +43,8 @@ class EmailVerificationController extends Controller
                 $user->email_verified_at = Carbon::now();
                 $user->save();
                 
-                // Redirect to landingpage2 after successful verification
-                return redirect()->route('landingpage2')->with('success', 'Email berhasil diverifikasi!');
+                // Redirect to profile after successful verification
+                return redirect()->route('profile')->with('success', 'Email berhasil diverifikasi!');
             }
         }
         
@@ -64,8 +64,8 @@ class EmailVerificationController extends Controller
             $user->email_verified_at = Carbon::now();
             $user->save();
 
-            // Redirect to landingpage2 after successful verification
-            return redirect()->route('landingpage2')->with('success', 'Email berhasil diverifikasi!');
+            // Redirect to profile after successful verification
+            return redirect()->route('profile')->with('success', 'Email berhasil diverifikasi!');
         }
 
         return redirect()->route('login')->with('error', 'Terjadi kesalahan. Silakan login kembali.');

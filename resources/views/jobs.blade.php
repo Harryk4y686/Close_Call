@@ -216,8 +216,8 @@
             color: #00A49C;
             text-decoration: none;
             font-weight: 500;
-            margin-top: 20px;
-            margin-bottom: 32px;
+            margin-top: -16px;
+            margin-bottom: 24px;
         }
         
         /* Open Jobs Section - Similar to landingpage.blade.php */
@@ -234,11 +234,25 @@
             padding: 20px;
             margin-bottom: 15px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease;
+            transition: all 0.3s ease;
             gap: 20px;
+            opacity: 1;
+            max-height: 200px;
+            overflow: hidden;
         }
         .job-card:hover {
             transform: translateY(-2px);
+        }
+        .job-card.hiding {
+            opacity: 0;
+            max-height: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+            margin-bottom: 0;
+            transform: translateX(-100%);
+        }
+        .job-card.hidden {
+            display: none;
         }
         .job-logo {
             width: 50px;
@@ -254,12 +268,12 @@
         }
         .job-title {
             font-weight: 600;
-            font-size: 16px;
+            font-size: 18px;
             margin-bottom: 5px;
             color: #000;
         }
         .job-company {
-            font-size: 14px;
+            font-size: 16px;
             color: #666;
             margin-bottom: 8px;
         }
@@ -267,7 +281,7 @@
             display: flex;
             align-items: center;
             color: #00A49C;
-            font-size: 12px;
+            font-size: 16px;
             gap: 8px;
         }
         .job-apply-btn {
@@ -368,6 +382,129 @@
             font-size: 14px;
         }
         
+        /* Detailed Jobs (below Search for Jobs) */
+        .detailed-jobs-section {
+            margin-top: 20px;
+        }
+        .djob-card {
+            background: #FFFFFF;
+            border-radius: 12px;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+            border: 1px solid #E5E7EB;
+            padding: 16px 18px;
+            margin-bottom: 47px;
+        }
+        .djob-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .djob-logo {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .djob-headcol { flex: 1; min-width: 0; }
+        .djob-title-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 6px;
+        }
+        .djob-title {
+            font-weight: 700;
+            font-size: 18px;
+            color: #111827;
+        }
+        .djob-subinfo { font-size: 16px; color: #6b7280; }
+        .djob-subinfo a { color: #2F80ED; text-decoration: none; }
+        .djob-apply {
+            color: #00A49C;
+            font-weight: 600;
+            font-size: 18px;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        .djob-actions { display: inline-flex; align-items: center; gap: 10px; }
+        .djob-more {
+            width: 35px;
+            height: 35px;
+            border-radius: 9999px;
+            background: #EEF2F7;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #E5E7EB;
+            color: #111827;
+            text-decoration: none;
+        }
+        .djob-meta {
+            display: flex;
+            gap: 14px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 6px;
+        }
+        .djob-meta-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 16px;
+            color: #6b7280;
+        }
+        .djob-meta-item--green { color: #00A49C; }
+        .djob-section-title {
+            margin-top: 12px;
+            font-weight: 700;
+            font-size: 20px;
+            color: #111827;
+        }
+        .djob-desc {
+            margin-top: 4px;
+            font-size: 16px;
+            color: #4b5563;
+            line-height: 1.5;
+        }
+        .djob-desc strong { color: #111827; }
+        .djob-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .dtag {
+            background: #F3F4F6;
+            color: #374151;
+            border-radius: 20px;
+            padding: 5px 12px;
+            font-size: 16px;
+            font-weight: 500;
+            border: 1px solid #E5E7EB;
+        }
+
+        /* Error Message Styles */
+        .error-alert {
+            background-color: #FEE2E2;
+            border: 1px solid #FECACA;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .error-alert .error-icon {
+            color: #DC2626;
+            flex-shrink: 0;
+        }
+        .error-alert .error-text {
+            color: #DC2626;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
         /* Sidebar styles from profile.blade.php */
         .sidebar {
             position: fixed;
@@ -484,11 +621,8 @@
         <a href="{{ route('events') }}" class="sidebar-icon" data-page="events">
             <img src="{{ asset('image/events.png') }}" alt="Events" class="sidebar-icon-img">
         </a>
-        <a href="{{ route('chats') }}" class="sidebar-icon" data-page="chats">
-            <img src="{{ asset('image/chats.png') }}" alt="Chats" class="sidebar-icon-img">
-        </a>
-        <a href="{{ route('genius') }}" class="sidebar-icon" data-page="genius">
-            <img src="{{ asset('image/genius.png') }}" alt="Genius" class="sidebar-icon-img">
+        <a href="{{ route('AI') }}" class="sidebar-icon" data-page="AI">
+            <img src="{{ asset('image/genius.png') }}" alt="AI" class="sidebar-icon-img">
         </a>
     </div>
 
@@ -516,9 +650,18 @@
                 </svg>
             </a>
             <a href="{{ route('profile') }}" class="avatar-icon">
-                <svg width="18" height="18" fill="#6b7280" viewBox="0 0 24 24">
-                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                </svg>
+                @if(isset($profile) && $profile->profile_picture)
+                    <img src="{{ asset('storage/' . $profile->profile_picture) }}" alt="Profile" 
+                         style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"
+                         onerror="console.error('Failed to load profile image:', this.src); this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <svg width="18" height="18" fill="#6b7280" viewBox="0 0 24 24" style="display: none;">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
+                @else
+                    <svg width="18" height="18" fill="#6b7280" viewBox="0 0 24 24">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
+                @endif
             </a>
         </div>
 
@@ -530,6 +673,22 @@
                 <h1 class="jobs-title">Jobs For You</h1>
             </div>
 
+            <!-- Display Validation Errors -->
+            @if ($errors->any())
+                <div class="error-alert">
+                    <div class="error-icon">
+                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zM12 7a1 1 0 011 1v4a1 1 0 01-2 0V8a1 1 0 011-1zm0 8a1 1 0 100 2 1 1 0 000-2z"/>
+                        </svg>
+                    </div>
+                    <div class="error-text">
+                        @foreach ($errors->all() as $error)
+                            {{ $error }}
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+
             <!-- Complete your Profile Section -->
             <div class="complete-profile">
                 <h2 class="complete-title">Complete your Profile first!</h2>
@@ -537,17 +696,17 @@
                 
                 <div class="progress-container">
                     <div class="progress-bar">
-                        <div class="progress-fill"></div>
+                        <div class="progress-fill" id="jobs-progress-fill" style="width: {{ isset($profile) && $profile->completion_percentage ? $profile->completion_percentage : 0 }}%;"></div>
                     </div>
-                    <span style="color: #00A88F; font-weight: 600;">50%</span>
+                    <span id="jobs-progress-text" style="color: #00A88F; font-weight: 600;">{{ isset($profile) && $profile->completion_percentage ? $profile->completion_percentage : 0 }}%</span>
                 </div>
                 
-                <button class="complete-btn">
+                <a href="{{ route('profile') }}" class="complete-btn">
                     Complete Profile
                     <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
                     </svg>
-                </button>
+                </a>
             </div>
 
             <!-- Job Categories Section - Same as landingpage.blade.php -->
@@ -630,7 +789,7 @@
                         <div class="job-title">Data Analyst</div>
                         <div class="job-company">Indonesia | GRHA Digital</div>
                         <div class="job-status">
-                            <svg width="16" height="10" fill="currentColor" viewBox="0 0 24 24">
+                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
                             </svg>
                             Actively reviewing applications
@@ -639,19 +798,19 @@
                     <a href="#" class="job-apply-btn" data-job="data-analyst">×</a>
                 </div>
 
-                <div class="job-card">
+                <div class="job-card" style="cursor: pointer;" title="Click to apply for this position">
                     <img src="{{ asset('image/socialmediamanager.png') }}" alt="Social Media Manager" class="job-logo">
                     <div class="job-details">
                         <div class="job-title">Social Media Manager</div>
                         <div class="job-company">Indonesia | Best Partner Education</div>
                         <div class="job-status">
-                            <svg width="16" height="10" fill="currentColor" viewBox="0 0 24 24">
+                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
                             </svg>
                             Actively reviewing applications
                         </div>
                     </div>
-                    <a href="{{ route('bestpartnerjob') }}" class="job-apply-btn">×</a>
+                    <a href="#" class="job-apply-btn" data-job="social-media-manager" data-apply-url="{{ route('bestpartnerjob') }}">×</a>
                 </div>
 
                 <div class="job-card">
@@ -660,7 +819,7 @@
                         <div class="job-title">Mechanical Engineer</div>
                         <div class="job-company">Indonesia | R-Tech Computer</div>
                         <div class="job-status">
-                            <svg width="16" height="10" fill="currentColor" viewBox="0 0 24 24">
+                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
                             </svg>
                             Actively reviewing applications
@@ -692,7 +851,133 @@
                     </div>
                     <a href="#" class="filter-link">Filter searches...</a>
                 </div>
+
             </div>
+
+                <!-- Detailed Jobs (matches provided mock) -->
+                <div class="detailed-jobs-section">
+                    <!-- Card 1 -->
+                    <div class="djob-card">
+                        <div class="djob-header">
+                            <img style="width: 65px; height:65px" src="{{ asset('image/socialmediamanager.png') }}" class="djob-logo" alt="Logo">
+                            <div class="djob-headcol">
+                                <div class="djob-title-row">
+                                    <div class="djob-title">Social Media Manager</div>
+                                    <div class="djob-actions">
+                                        <a href="{{ route('bestpartnerjob') }}" class="djob-apply">+ Apply</a>
+                                        <a href="#" class="djob-more" aria-label="More options">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="#111827"><circle cx="12" cy="9" r="2"/><circle cx="12" cy="15" r="2"/></svg>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="djob-subinfo">Indonesia | Best Partner Education</div>
+                                <div class="djob-meta">
+                                    <span class="djob-meta-item djob-meta-item--green">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                                        Actively reviewing applications
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="djob-section-title">Job Description</div>
+                        <div class="djob-desc">
+                            <strong>Vector Illustrator (Badge Art Concept – Gamification Project)</strong><br>
+                            We are seeking a vector illustrator to help us in the exploration of a visual direction for badge art within a larger gamification platform. This is a short-term opportunity to showcase your illustration style through concept work.
+                        </div>
+                        <div class="djob-desc">
+                            <strong>Project Overview</strong><br>
+                            You will be exploring badge art concepts that align with our platform’s tone and user experience. This is a short exploratory engagement to review your approach and see how it could evolve across a full slate of achievements. If your work aligns with our vision, there is potential for a longer-term engagement to illustrate the full badge set and other visual assets across the platform.
+                        </div>
+                        <div class="djob-tags">
+                            <span class="dtag">#remote</span>
+                            <span class="dtag">#design</span>
+                            <span class="dtag">#socialmedia</span>
+                            <span class="dtag">#activelyreviewing</span>
+                        </div>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="djob-card">
+                        <div class="djob-header">
+                            <img style="width: 65px; height:65px" src="{{ asset('image/soechi.png') }}" class="djob-logo" alt="Logo">
+                            <div class="djob-headcol">
+                                <div class="djob-title-row">
+                                    <div class="djob-title">Graphic Designer</div>
+                                    <div class="djob-actions">
+                                        <a href="#" class="djob-apply">+ Apply</a>
+                                        <a href="#" class="djob-more" aria-label="More options">
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="#111827"><circle cx="12" cy="9" r="2"/><circle cx="12" cy="15" r="2"/></svg>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="djob-subinfo">Indonesia | SOECHI Group</div>
+                                <div class="djob-meta">
+                                    <span class="djob-meta-item djob-meta-item--green">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                                        Actively reviewing applications
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="djob-section-title">Job Description</div>
+                        <div class="djob-desc">
+                            We are seeking a graphic designer to help us explore creative directions for visual identity and brand assets within a larger branding initiative. This is a short-term opportunity to showcase your unique approach through concept work.
+                        </div>
+                        <div class="djob-desc">
+                            <strong>Project Overview</strong><br>
+                            You will be exploring and iterating graphic design concepts that align with our brand’s values, tone, and user experience. This is a short exploratory engagement to review your approach and see how it could evolve during the final build of branding materials and other visual assets across campaigns.
+                        </div>
+                        <div class="djob-tags">
+                            <span class="dtag">#remote</span>
+                            <span class="dtag">#design</span>
+                            <span class="dtag">#graphicdesign</span>
+                            <span class="dtag">#activelyreviewing</span>
+                        </div>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="djob-card">
+                        <div class="djob-header">
+                            <img style="width: 65px; height:65px" src="{{ asset('image/halojasa.png') }}" class="djob-logo" alt="Logo">
+                            <div class="djob-headcol">
+                                <div class="djob-title-row">
+                                    <div class="djob-title">Design Illustrator</div>
+                                    <div class="djob-actions">
+                                        <a href="#" class="djob-apply">+ Apply</a>
+                                        <a href="#" class="djob-more" aria-label="More options">
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="#111827"><circle cx="12" cy="9" r="2"/><circle cx="12" cy="15" r="2"/></svg>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="djob-subinfo">Indonesia | HaloJasa Indonesia</div>
+                                <div class="djob-meta">
+                                    <span class="djob-meta-item djob-meta-item--green">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                                        Actively reviewing applications
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="djob-section-title">Job Description</div>
+                        <div class="djob-desc">
+                            <strong>Do you enjoy working at home or studio?</strong><br>
+                            We offer flexible working hours; most weeks do not require you to come to the office. In fact you can work better from home and manage your own schedule. We’re looking for an effective person for you to be Design Illustrator. Of course because of this work you can work on image design through the internet.
+                        </div>
+                        <div class="djob-desc">
+                            The most important thing from our company are your product works of art with great ideas and full of motivation. Your product images and illustrations will be used for many of our product works. That is, the only one more appreciated from what you have are the Design Illustrator team.
+                        </div>
+                        <div class="djob-tags">
+                            <span class="dtag">#remote</span>
+                            <span class="dtag">#design</span>
+                            <span class="dtag">#graphicdesign</span>
+                            <span class="dtag">#activelyreviewing</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- End Detailed Jobs -->
         </div>
     </div>
 
@@ -728,50 +1013,74 @@
             });
         });
 
-        // Handle job apply buttons
+        // Handle job apply buttons (X button to hide jobs)
         document.querySelectorAll('.job-apply-btn').forEach(btn => {
             btn.addEventListener('click', function(e) {
-                const href = this.getAttribute('href');
-                const jobData = this.getAttribute('data-job');
+                e.preventDefault(); // Always prevent default for X button
                 
-                // If href is not "#", let the link work normally
-                if (href && href !== '#') {
-                    // Let the anchor tag handle navigation
-                    return;
-                }
+                const jobCard = this.closest('.job-card');
                 
-                // Handle navigation based on data-job attribute
-                if (jobData) {
-                    e.preventDefault();
-                    console.log('Apply for job:', jobData);
-                    
-                    // Navigate based on job type
-                    switch(jobData) {
-                        case 'data-analyst':
-                            // TODO: Add your route here
-                            console.log('Navigate to Data Analyst apply page');
-                            // window.location.href = '/job/data-analyst/apply';
-                            break;
-                        case 'social-media-manager':
-                            // TODO: Add your route here  
-                            console.log('Navigate to Social Media Manager apply page');
-                            // window.location.href = '/job/social-media-manager/apply';
-                            break;
-                        case 'mechanical-engineer':
-                            // TODO: Add your route here
-                            console.log('Navigate to Mechanical Engineer apply page');
-                            // window.location.href = '/job/mechanical-engineer/apply';
-                            break;
-                        default:
-                            console.log('No specific route set for this job');
-                    }
-                } else {
-                    // Fallback: prevent default for placeholder links
-                    e.preventDefault();
-                    console.log('Please set up navigation for this apply button');
-                }
+                // All X buttons now hide the job card
+                hideJobCard(jobCard);
             });
         });
+
+        // Function to hide job card with smooth animation
+        function hideJobCard(jobCard) {
+            if (!jobCard) return;
+            
+            // Add hiding class for animation
+            jobCard.classList.add('hiding');
+            
+            // After animation completes, fully hide the element
+            setTimeout(() => {
+                jobCard.classList.add('hidden');
+                jobCard.classList.remove('hiding');
+                
+                // Optional: Log for debugging
+                const jobTitle = jobCard.querySelector('.job-title')?.textContent || 'Unknown Job';
+                console.log('Hidden job:', jobTitle);
+                
+                // Check if all jobs are hidden
+                checkIfAllJobsHidden();
+            }, 300); // Match the CSS transition duration
+        }
+
+        // Function to check if all jobs are hidden and show a message
+        function checkIfAllJobsHidden() {
+            const jobsList = document.querySelector('.jobs-list');
+            const visibleJobs = jobsList.querySelectorAll('.job-card:not(.hidden)');
+            
+            if (visibleJobs.length === 0) {
+                // All jobs are hidden, show a message
+                if (!jobsList.querySelector('.no-jobs-message')) {
+                    const noJobsMessage = document.createElement('div');
+                    noJobsMessage.className = 'no-jobs-message';
+                    noJobsMessage.style.cssText = `
+                        text-align: center;
+                        padding: 40px 20px;
+                        color: #6b7280;
+                        font-style: italic;
+                    `;
+                    noJobsMessage.innerHTML = 'No more jobs to display. <a href="#" onclick="showAllJobs()" style="color: #00A88F; text-decoration: underline;">Show all jobs again</a>';
+                    jobsList.appendChild(noJobsMessage);
+                }
+            }
+        }
+
+        // Function to show all jobs again
+        window.showAllJobs = function() {
+            const jobCards = document.querySelectorAll('.job-card.hidden');
+            const noJobsMessage = document.querySelector('.no-jobs-message');
+            
+            jobCards.forEach(card => {
+                card.classList.remove('hidden');
+            });
+            
+            if (noJobsMessage) {
+                noJobsMessage.remove();
+            }
+        };
 
         // Handle category cards click
         document.querySelectorAll('.category-card').forEach(card => {
@@ -787,27 +1096,64 @@
             });
         });
 
-        // Handle job card clicks (for more details)
+        // Handle job card clicks (for more details or application)
         document.querySelectorAll('.job-card').forEach(card => {
             card.addEventListener('click', function(e) {
-                // Don't trigger if clicking the apply button
+                // Don't trigger if clicking the apply button (X button)
                 if (!e.target.closest('.job-apply-btn')) {
                     const jobTitle = this.querySelector('.job-title').textContent;
-                    console.log('Navigate to job details:', jobTitle);
+                    const applyBtn = this.querySelector('.job-apply-btn');
+                    const applyUrl = applyBtn ? applyBtn.getAttribute('data-apply-url') : null;
                     
-                    // TODO: Navigate to job details page
-                    // Example: window.location.href = `/job/${jobSlug}`;
-                    // For now, you can uncomment below to navigate to bestpartnerjob.blade.php
-                    // window.location.href = '/bestpartnerjob';
+                    if (applyUrl) {
+                        // If job has an application URL, navigate to it
+                        console.log('Navigate to application page for:', jobTitle);
+                        window.location.href = applyUrl;
+                    } else {
+                        // For jobs without application URL, show job details
+                        console.log('Navigate to job details:', jobTitle);
+                        // TODO: Navigate to job details page
+                        // Example: window.location.href = `/job/${jobSlug}`;
+                    }
                 }
             });
         });
 
-        // Animate progress bar on page load
+        // Function to update progress on jobs page
+        function updateJobsProgress() {
+            fetch('{{ route("profile.completion") }}')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.completion_percentage !== undefined) {
+                        const progressFill = document.getElementById('jobs-progress-fill');
+                        const progressText = document.getElementById('jobs-progress-text');
+                        
+                        if (progressFill && progressText) {
+                            progressFill.style.width = data.completion_percentage + '%';
+                            progressText.textContent = data.completion_percentage + '%';
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating progress:', error);
+                });
+        }
+
+        // Update progress when page loads and animate
         window.addEventListener('load', function() {
-            setTimeout(function() {
-                document.querySelector('.progress-fill').style.width = '50%';
-            }, 500);
+            updateJobsProgress();
+        });
+
+        // Update progress when user returns to the page (from profile page)
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                updateJobsProgress();
+            }
+        });
+
+        // Update progress when page gains focus
+        window.addEventListener('focus', function() {
+            updateJobsProgress();
         });
     </script>
 </body>

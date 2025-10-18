@@ -24,11 +24,23 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $fillable = [
         'name',
         'last_name',
+        'first_name',
         'email',
         'phone_number',
+        'mobile_number',
         'country',
         'password',
         'verified',
+        'date_of_birth',
+        'gender',
+        'location',
+        'postal_code',
+        'profile_photo',
+        'banner_photo',
+        'resume_file',
+        'cv_file',
+        'portfolio_file',
+        'profile_completion_percentage',
     ];
 
     /**
@@ -55,5 +67,20 @@ class User extends Authenticatable implements MustVerifyEmail
     public function emailVerifications()
     {
         return $this->hasMany(EmailVerification::class);
+    }
+
+    public function sentChats()
+    {
+        return $this->hasMany(Chat::class, 'sender_id');
+    }
+
+    public function receivedChats()
+    {
+        return $this->hasMany(Chat::class, 'receiver_id');
+    }
+
+    public function registeredProfile()
+    {
+        return $this->hasOne(PenggunaRegistered::class, 'user_id');
     }
 }

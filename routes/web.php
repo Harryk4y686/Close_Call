@@ -6,6 +6,9 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\EmailVerificationController;
 use App\Http\Controllers\Auth\UserRegistrationController;
 use App\Http\Controllers\Auth\EmailVerificationController as CustomEmailVerificationController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TestRelationController;
+use App\Http\Controllers\ChatController;
 use App\Mail\VerifyEmailUser;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
@@ -19,8 +22,51 @@ Route::get('/', function () {
 
 // halaman home/landing page dengan akun (protected route - requires authentication and verification)
 Route::get('/landingpage2', function () {
-    return view('landingpage2');
-})->middleware(['auth'])->name('landingpage2');
+    return view('landing-page');
+})->middleware(['auth'])->name('landing-page');
+
+// Profile routes (protected - requires authentication)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
+    Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
+    Route::get('/profile/completion', [ProfileController::class, 'getCompletionPercentage'])->name('profile.completion');
+});
+
+// complete profile route
+Route::get('/complete-profile', function () {
+    return redirect()->route('profile');
+})->name('complete.profile');
+ 
+// Jobs page (protected - requires authentication)
+Route::get('/jobs', function () {
+    $user = Auth::user();
+    $profile = $user->registeredProfile;
+    return view('jobs', compact('user', 'profile'));
+})->middleware(['auth'])->name('jobs');
+ 
+// (testing) halaman events
+Route::get('/events', function () {
+    return view('events');
+})->name('events');
+ 
+// Chat routes (protected - requires authentication)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/chats', [ChatController::class, 'index'])->name('chats');
+    Route::get('/chats/{user}', [ChatController::class, 'show'])->name('chats.show');
+    Route::post('/chats', [ChatController::class, 'store'])->name('chats.store');
+    Route::get('/api/chats/{user}/messages', [ChatController::class, 'getMessages'])->name('chats.messages');
+    Route::get('/api/users', [ChatController::class, 'getUsersList'])->name('users.list');
+});
+
+// (testing) halaman AI
+Route::get('/AI', function () {
+    return view('AI');
+})->name('AI');
+
+// (testing) halaman bestpartner
+Route::get('/bestpartnerjob ', function () {
+    return view('bestpartnerjob');
+})->name('bestpartnerjob');
 
 // halaman register
 Route::get('/register', [UserRegistrationController::class, 'showRegistrationForm'])->name('register');
@@ -43,7 +89,7 @@ Route::middleware('auth')->group(function () {
     // Handle verification link
     Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
         $request->fulfill();
-        return redirect('/home'); // or wherever
+        return redirect('/profile'); // redirect to profile page
     })->middleware(['signed'])->name('verification.verify');
 
     // Resend verification email
@@ -84,3 +130,14 @@ Route::get('/test-email', function () {
 // Custom Email Verification System Routes
 Route::post('/resend-verification', [UserRegistrationController::class, 'resendVerification'])->name('verification.resend');
 Route::get('/verify-email', [CustomEmailVerificationController::class, 'verify'])->name('email.verify');
+
+// Test Relationship Routes (for development/testing)
+Route::get('/test-relations-page', function () {
+    return view('test-relations');
+})->name('test.relations.page');
+Route::get('/test-relations', [TestRelationController::class, 'testRelations'])->name('test.relations');
+Route::get('/show-users-profiles', [TestRelationController::class, 'showAllUsersWithProfiles'])->name('test.users.profiles');
+Route::get('/test-progress', [TestRelationController::class, 'testProgressSaving'])->name('test.progress');
+
+// Include debug routes
+require __DIR__.'/debug.php';

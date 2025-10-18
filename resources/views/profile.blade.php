@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Profile - CloseCall</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -341,12 +342,13 @@
             width: 174px;
             height: 174px;
             border-radius: 50%;
-            background: conic-gradient(#00A88F 0deg 180deg, #e5e7eb 180deg 360deg);
+            background: conic-gradient(#00A88F 0deg {{ isset($profile) && $profile->completion_percentage ? ($profile->completion_percentage / 100 * 360) : 0 }}deg, #e5e7eb {{ isset($profile) && $profile->completion_percentage ? ($profile->completion_percentage / 100 * 360) : 0 }}deg 360deg);
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0 auto 1rem;
             position: relative;
+            transition: background 0.5s ease;
         }
         .progress-circle::before {
             content: '';
@@ -435,8 +437,8 @@
         <a href="{{ route('chats') }}" class="sidebar-icon" data-page="chats">
             <img src="{{ asset('image/chats.png') }}" alt="Chats" class="sidebar-icon-img">
         </a>
-        <a href="{{ route('genius') }}" class="sidebar-icon" data-page="genius">
-            <img src="{{ asset('image/genius.png') }}" alt="Genius" class="sidebar-icon-img">
+        <a href="{{ route('AI') }}" class="sidebar-icon" data-page="AI">
+            <img src="{{ asset('image/genius.png') }}" alt="AI" class="sidebar-icon-img">
         </a>
     </div>
 
@@ -473,91 +475,109 @@
                         <button class="btn-edit">Edit Banner</button>
                     </div>
                     <div class="profile-avatar">
-                        <svg width="60" height="60" fill="#9ca3af" viewBox="0 0 24 24">
-                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                        </svg>
+                        @if(isset($profile) && $profile->profile_picture)
+                            <img src="{{ asset('storage/' . $profile->profile_picture) }}" alt="Profile Picture" 
+                                 onerror="console.error('Failed to load image:', this.src); this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <svg width="60" height="60" fill="#9ca3af" viewBox="0 0 24 24" style="display: none;">
+                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                            </svg>
+                        @else
+                            <svg width="60" height="60" fill="#9ca3af" viewBox="0 0 24 24">
+                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                            </svg>
+                        @endif
                     </div>
                 </div>
 
                 <!-- Personal Information Section -->
                 <h2 class="section-title">Personal Information</h2>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label><b>First name</b></label>
-                        <input type="text" placeholder="Enter your first name">
+                <form id="profile-form" enctype="multipart/form-data">
+                    @csrf
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label><b>First name</b></label>
+                            <input type="text" id="first-name" name="first_name" placeholder="Enter your first name" value="{{ $user->first_name ?? '' }}">
+                        </div>
+                        <div class="form-group">
+                            <label><b>Last name</b></label>
+                            <input type="text" id="last-name" name="last_name" placeholder="Enter your last name" value="{{ $user->last_name ?? '' }}">
+                        </div>
+                        <div class="form-group">
+                            <label><b>Email</b></label>
+                            <input type="email" id="email" name="email" placeholder="Enter your email" value="{{ $user->email ?? '' }}">
+                        </div>
+                        <div class="form-group">
+                            <label><b>Mobile Number</b></label>
+                            <input type="tel" id="mobile-number" name="phone_number" placeholder="Enter your mobile number" value="{{ $user->phone_number ?? '' }}">
+                        </div>
+                        <div class="form-group">
+                            <label><b>Date of Birth</b></label>
+                            <input type="date" id="date-of-birth" name="date_of_birth" placeholder="Select your date of birth" value="{{ $profile->date_of_birth ?? '' }}">
+                        </div>
+                        <div class="form-group">
+                            <label><b>Gender</b></label>
+                            <select id="gender" name="gender">
+                                <option value="" disabled {{ !isset($profile->gender) ? 'selected' : '' }}>Select your gender</option>
+                                <option value="male" {{ isset($profile->gender) && $profile->gender == 'male' ? 'selected' : '' }}>Male</option>
+                                <option value="female" {{ isset($profile->gender) && $profile->gender == 'female' ? 'selected' : '' }}>Female</option>
+                                <option value="other" {{ isset($profile->gender) && $profile->gender == 'other' ? 'selected' : '' }}>Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label><b>Location</b></label>
+                            <input type="text" id="location" name="location" placeholder="Enter your location" value="{{ $profile->location ?? '' }}">
+                        </div>
+                        <div class="form-group">
+                            <label><b>Postal Code</b></label>
+                            <input type="text" id="postal-code" name="postal_code" placeholder="Enter your postal code" value="{{ $profile->postal_code ?? '' }}">
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label><b>Last name</b></label>
-                        <input type="text" placeholder="Enter your last name">
-                    </div>
-                    <div class="form-group">
-                        <label><b>Email</b></label>
-                        <input type="email" placeholder="Enter your email">
-                    </div>
-                    <div class="form-group">
-                        <label><b>Mobile Number</b></label>
-                        <input type="tel" placeholder="Enter your mobile number">
-                    </div>
-                    <div class="form-group">
-                        <label><b>Date of Birth</b></label>
-                        <input type="date" placeholder="Select your date of birth">
-                    </div>
-                    <div class="form-group">
-                        <label><b>Gender</b></label>
-                        <select>
-                            <option value="" disabled selected>Select your gender</option>
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label><b>Location</b></label>
-                        <input type="text" placeholder="Enter your location">
-                    </div>
-                    <div class="form-group">
-                        <label><b>Postal Code</b></label>
-                        <input type="text" placeholder="Enter your postal code">
-                    </div>
-                </div>
 
                 <!-- Professional Information Section -->
                 <h2 class="section-title">Professional Information</h2>
                 
-                <div class="upload-section">
-                    <h3 class="upload-title">Upload Your Resume</h3>
-                    <div class="upload-container">
-                        <button class="upload-btn">
-                            <img src="{{ asset('image/upload.png') }}" alt="Resume Icon" class="upload-icon">
-                            <b>Upload Resume</b>
-                        </button>
-                        <button class="cancel-btn" style="display: none;" onclick="cancelFile(this)">×</button>
-                    </div>
-                </div>
+                    <!-- Hidden file inputs -->
+                    <input type="file" id="profile-picture-input" name="profile_picture" accept="image/*" style="display: none;">
+                    <input type="file" id="banner-image-input" name="banner_image" accept="image/*" style="display: none;">
+                    <input type="file" id="resume-input" name="resume" accept=".pdf,.doc,.docx" style="display: none;">
+                    <input type="file" id="cv-input" name="cv" accept=".pdf,.doc,.docx" style="display: none;">
+                    <input type="file" id="portfolio-input" name="portfolio" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" style="display: none;">
 
-                <div class="upload-section">
-                    <h3 class="upload-title">Upload Your Curriculum Vitae</h3>
-                    <div class="upload-container">
-                        <button class="upload-btn">
-                            <img src="{{ asset('image/upload.png') }}" alt="CV Icon" class="upload-icon">
-                            <b>Upload CV</b>
-                        </button>
-                        <button class="cancel-btn" style="display: none;" onclick="cancelFile(this)">×</button>
+                    <div class="upload-section">
+                        <h3 class="upload-title">Upload Your Resume</h3>
+                        <div class="upload-container">
+                            <button type="button" class="upload-btn" data-target="resume-input">
+                                <img src="{{ asset('image/upload.png') }}" alt="Resume Icon" class="upload-icon">
+                                <b>{{ isset($profile) && $profile->resume_path ? 'Change Resume' : 'Upload Resume' }}</b>
+                            </button>
+                            <button class="cancel-btn" style="display: none;" onclick="cancelFile(this)">×</button>
+                        </div>
                     </div>
-                </div>
 
-                <div class="upload-section">
-                    <h3 class="upload-title">Upload Your Portfolio</h3>
-                    <div class="upload-container">
-                        <button class="upload-btn">
-                            <img src="{{ asset('image/upload.png') }}" alt="Portfolio Icon" class="upload-icon">
-                            <b>Upload Portfolio</b>
-                        </button>
-                        <button class="cancel-btn" style="display: none;" onclick="cancelFile(this)">×</button>
+                    <div class="upload-section">
+                        <h3 class="upload-title">Upload Your Curriculum Vitae</h3>
+                        <div class="upload-container">
+                            <button type="button" class="upload-btn" data-target="cv-input">
+                                <img src="{{ asset('image/upload.png') }}" alt="CV Icon" class="upload-icon">
+                                <b>{{ isset($profile) && $profile->cv_path ? 'Change CV' : 'Upload CV' }}</b>
+                            </button>
+                            <button class="cancel-btn" style="display: none;" onclick="cancelFile(this)">×</button>
+                        </div>
                     </div>
-                </div>
 
-                <button class="save-btn">Save</button>
+                    <div class="upload-section">
+                        <h3 class="upload-title">Upload Your Portfolio</h3>
+                        <div class="upload-container">
+                            <button type="button" class="upload-btn" data-target="portfolio-input">
+                                <img src="{{ asset('image/upload.png') }}" alt="Portfolio Icon" class="upload-icon">
+                                <b>{{ isset($profile) && $profile->portfolio_path ? 'Change Portfolio' : 'Upload Portfolio' }}</b>
+                            </button>
+                            <button class="cancel-btn" style="display: none;" onclick="cancelFile(this)">×</button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="save-btn">Save</button>
+                </form>
             </div>
 
             <!-- Right Sidebar -->
@@ -565,51 +585,44 @@
                 <!-- Complete your Profile Section -->
                 <div class="completion-section">
                     <h3 class="completion-title">Complete your Profile</h3>
-                    <div class="progress-circle">
-                        <span class="progress-text">50%</span>
+                    <div class="progress-circle" id="progressCircle">
+                        <span class="progress-text" id="progressText">{{ isset($profile) && $profile->completion_percentage ? $profile->completion_percentage : 0 }}%</span>
                     </div>
                     <ul class="completion-list">
-                        <li class="completion-item">
+                        <li class="completion-item" id="photo-item">
                             <div class="completion-status">
-                                <span class="check-icon">✓</span>
-                                <span>Setup account</span>
-                            </div>
-                            <span class="completion-percentage">10%</span>
-                        </li>
-                        <li class="completion-item">
-                            <div class="completion-status">
-                                <span class="x-icon">X</span>
+                                <span class="x-icon" id="photo-icon">X</span>
                                 <span>Upload your Photo</span>
-                            </div>
-                            <span class="completion-percentage">+5%</span>
-                        </li>
-                        <li class="completion-item">
-                            <div class="completion-status">
-                                <span class="check-icon">✓</span>
-                                <span>Personal Info</span>
                             </div>
                             <span class="completion-percentage">20%</span>
                         </li>
-                        <li class="completion-item">
+                        <li class="completion-item" id="personal-info-item">
                             <div class="completion-status">
-                                <span class="check-icon">✓</span>
+                                <span class="x-icon" id="personal-info-icon">X</span>
+                                <span>Personal Info</span>
+                            </div>
+                            <span class="completion-percentage">25%</span>
+                        </li>
+                        <li class="completion-item" id="location-item">
+                            <div class="completion-status">
+                                <span class="x-icon" id="location-icon">X</span>
                                 <span>Location</span>
                             </div>
                             <span class="completion-percentage">20%</span>
                         </li>
-                        <li class="completion-item">
+                        <li class="completion-item" id="resume-cv-item">
                             <div class="completion-status">
-                                <span class="x-icon">X</span>
+                                <span class="x-icon" id="resume-cv-icon">X</span>
                                 <span>Resume & CV</span>
                             </div>
-                            <span class="completion-percentage">+20%</span>
+                            <span class="completion-percentage">20%</span>
                         </li>
-                        <li class="completion-item">
+                        <li class="completion-item" id="portfolio-item">
                             <div class="completion-status">
-                                <span class="x-icon">X</span>
+                                <span class="x-icon" id="portfolio-icon">X</span>
                                 <span>Portfolio</span>
                             </div>
-                            <span class="completion-percentage">+20%</span>
+                            <span class="completion-percentage">15%</span>
                         </li>
                     </ul>
                 </div>
@@ -632,17 +645,142 @@
         // Add smooth scrolling behavior
         document.documentElement.style.scrollBehavior = 'smooth';
 
+        // Profile completion tracking - initialize from server data
+        let completionData = {
+            uploadPhoto: {{ isset($profile) && $profile->profile_picture ? 'true' : 'false' }},    // 20%
+            personalInfo: {{ isset($profile) && $profile->date_of_birth && $profile->gender && isset($user) && $user->first_name && $user->last_name && $user->email && $user->phone_number ? 'true' : 'false' }},   // 25%
+            location: {{ isset($profile) && $profile->location && $profile->postal_code ? 'true' : 'false' }},       // 20%
+            resume: {{ isset($profile) && $profile->resume_path ? 'true' : 'false' }},         // Resume file
+            cv: {{ isset($profile) && $profile->cv_path ? 'true' : 'false' }},             // CV file
+            portfolio: {{ isset($profile) && $profile->portfolio_path ? 'true' : 'false' }}       // 15%
+        };
+
+        // Update progress circle
+        function updateProgressCircle() {
+            let totalPercentage = 0;
+            
+            if (completionData.uploadPhoto) totalPercentage += 20;
+            if (completionData.personalInfo) totalPercentage += 25;
+            if (completionData.location) totalPercentage += 20;
+            if (completionData.resume && completionData.cv) totalPercentage += 20; // Both resume AND CV required
+            if (completionData.portfolio) totalPercentage += 15;
+
+            const progressCircle = document.getElementById('progressCircle');
+            const progressText = document.getElementById('progressText');
+            
+            // Update text
+            progressText.textContent = totalPercentage + '%';
+            
+            // Update circle (360 degrees = 100%, so percentage * 3.6 = degrees)
+            const degrees = (totalPercentage / 100) * 360;
+            progressCircle.style.background = `conic-gradient(#00A88F 0deg ${degrees}deg, #e5e7eb ${degrees}deg 360deg)`;
+        }
+
+        // Update completion item status
+        function updateCompletionItem(itemId, iconId, isCompleted) {
+            const icon = document.getElementById(iconId);
+            if (isCompleted) {
+                icon.textContent = '✓';
+                icon.className = 'check-icon';
+            } else {
+                icon.textContent = 'X';
+                icon.className = 'x-icon';
+            }
+        }
+
+        // Check personal info completion
+        function checkPersonalInfo() {
+            const firstName = document.getElementById('first-name').value.trim();
+            const lastName = document.getElementById('last-name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const mobile = document.getElementById('mobile-number').value.trim();
+            const dateOfBirth = document.getElementById('date-of-birth').value.trim();
+            const gender = document.getElementById('gender').value;
+
+            const isCompleted = firstName && lastName && email && mobile && dateOfBirth && gender;
+            completionData.personalInfo = isCompleted;
+            updateCompletionItem('personal-info-item', 'personal-info-icon', isCompleted);
+            updateProgressCircle();
+        }
+
+        // Check location completion
+        function checkLocation() {
+            const location = document.getElementById('location').value.trim();
+            const postalCode = document.getElementById('postal-code').value.trim();
+
+            const isCompleted = location && postalCode;
+            completionData.location = isCompleted;
+            updateCompletionItem('location-item', 'location-icon', isCompleted);
+            updateProgressCircle();
+        }
+
+        // Check resume & CV completion (both required)
+        function checkResumeCV() {
+            const isCompleted = completionData.resume && completionData.cv;
+            updateCompletionItem('resume-cv-item', 'resume-cv-icon', isCompleted);
+            updateProgressCircle();
+        }
+
+        // Add event listeners to form inputs
+        document.addEventListener('DOMContentLoaded', function() {
+            // Personal info inputs
+            ['first-name', 'last-name', 'email', 'mobile-number', 'date-of-birth', 'gender'].forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('input', checkPersonalInfo);
+                    element.addEventListener('change', checkPersonalInfo);
+                }
+            });
+
+            // Location inputs
+            ['location', 'postal-code'].forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('input', checkLocation);
+                }
+            });
+
+            // Initial check and setup
+            updateProgressCircle();
+            
+            // Initialize completion items based on server data
+            updateCompletionItem('photo-item', 'photo-icon', completionData.uploadPhoto);
+            updateCompletionItem('personal-info-item', 'personal-info-icon', completionData.personalInfo);
+            updateCompletionItem('location-item', 'location-icon', completionData.location);
+            updateCompletionItem('resume-cv-item', 'resume-cv-icon', completionData.resume && completionData.cv);
+            updateCompletionItem('portfolio-item', 'portfolio-icon', completionData.portfolio);
+        });
+
         // Handle upload button clicks
-        document.querySelectorAll('.upload-btn').forEach(btn => {
+        document.querySelectorAll('.upload-btn').forEach((btn) => {
             btn.addEventListener('click', function() {
-                // Create file input
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.accept = '.png,.jpg,.jpeg';
+                const targetId = this.getAttribute('data-target');
+                const targetInput = document.getElementById(targetId);
                 
-                input.addEventListener('change', function(e) {
-                    if (e.target.files.length > 0) {
-                        const fileName = e.target.files[0].name;
+                if (targetInput) {
+                    targetInput.click();
+                }
+            });
+        });
+
+        // Handle file input changes
+        document.querySelectorAll('input[type="file"]').forEach(input => {
+            input.addEventListener('change', function(e) {
+                if (e.target.files.length > 0) {
+                    const fileName = e.target.files[0].name;
+                    const targetId = this.id;
+                    let btn = null;
+                    
+                    // Find the corresponding button
+                    if (targetId === 'resume-input') {
+                        btn = document.querySelector('[data-target="resume-input"]');
+                    } else if (targetId === 'cv-input') {
+                        btn = document.querySelector('[data-target="cv-input"]');
+                    } else if (targetId === 'portfolio-input') {
+                        btn = document.querySelector('[data-target="portfolio-input"]');
+                    }
+                    
+                    if (btn) {
                         const originalText = btn.querySelector('b').textContent;
                         const cancelBtn = btn.parentElement.querySelector('.cancel-btn');
                         
@@ -656,10 +794,21 @@
                         
                         // Store original content for reset
                         btn.setAttribute('data-original', originalText);
+
+                        // Update completion based on upload type
+                        if (originalText.includes('Resume')) {
+                            completionData.resume = true;
+                            checkResumeCV();
+                        } else if (originalText.includes('CV')) {
+                            completionData.cv = true;
+                            checkResumeCV();
+                        } else if (originalText.includes('Portfolio')) {
+                            completionData.portfolio = true;
+                            updateCompletionItem('portfolio-item', 'portfolio-icon', true);
+                            updateProgressCircle();
+                        }
                     }
-                });
-                
-                input.click();
+                }
             });
         });
 
@@ -677,23 +826,167 @@
             uploadBtn.style.cursor = 'pointer';
             uploadBtn.removeAttribute('data-original');
             cancelBtn.style.display = 'none';
+
+            // Update completion based on upload type
+            if (originalText.includes('Resume')) {
+                completionData.resume = false;
+                checkResumeCV();
+            } else if (originalText.includes('CV')) {
+                completionData.cv = false;
+                checkResumeCV();
+            } else if (originalText.includes('Portfolio')) {
+                completionData.portfolio = false;
+                updateCompletionItem('portfolio-item', 'portfolio-icon', false);
+                updateProgressCircle();
+            }
         }
 
-        // Handle save button
-        document.querySelector('.save-btn').addEventListener('click', function() {
-            this.textContent = 'Saving...';
-            this.disabled = true;
-            
-            setTimeout(() => {
-                this.textContent = 'Saved!';
-                this.style.background = '#10b981';
+        // Handle Edit Profile button (photo upload)
+        document.querySelector('.btn-edit').addEventListener('click', function() {
+            document.getElementById('profile-picture-input').click();
+        });
+
+        // Handle profile picture change
+        document.getElementById('profile-picture-input').addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                const file = e.target.files[0];
+                console.log('Profile picture selected:', file.name, file.size, file.type);
                 
+                // Validate file type
+                if (!file.type.startsWith('image/')) {
+                    alert('Please select an image file.');
+                    return;
+                }
+                
+                // Validate file size (2MB)
+                if (file.size > 2 * 1024 * 1024) {
+                    alert('File size must be less than 2MB.');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const profileAvatar = document.querySelector('.profile-avatar');
+                    profileAvatar.innerHTML = `<img src="${e.target.result}" alt="Profile Picture">`;
+                    
+                    // Update photo completion
+                    completionData.uploadPhoto = true;
+                    updateCompletionItem('photo-item', 'photo-icon', true);
+                    updateProgressCircle();
+                    
+                    console.log('Profile picture preview updated');
+                };
+                
+                reader.onerror = function() {
+                    console.error('Error reading file');
+                    alert('Error reading the selected file.');
+                };
+                
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Handle Edit Banner button
+        document.querySelectorAll('.btn-edit')[1].addEventListener('click', function() {
+            document.getElementById('banner-image-input').click();
+        });
+
+        // Handle banner image change
+        document.getElementById('banner-image-input').addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const profileHeader = document.querySelector('.profile-header');
+                    profileHeader.style.background = `url(${e.target.result})`;
+                    profileHeader.style.backgroundSize = 'cover';
+                    profileHeader.style.backgroundPosition = 'center';
+                    profileHeader.style.backgroundRepeat = 'no-repeat';
+                };
+                
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Handle form submission
+        document.getElementById('profile-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const saveBtn = document.querySelector('.save-btn');
+            saveBtn.textContent = 'Saving...';
+            saveBtn.disabled = true;
+            
+            const formData = new FormData(this);
+            
+            // Debug: Log form data
+            console.log('Form submission data:');
+            for (let [key, value] of formData.entries()) {
+                if (value instanceof File) {
+                    console.log(key + ':', value.name, value.size, value.type);
+                } else {
+                    console.log(key + ':', value);
+                }
+            }
+            
+            fetch('{{ route("profile.update") }}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    saveBtn.textContent = 'Saved!';
+                    saveBtn.style.background = '#10b981';
+                    
+                    // Update profile picture if changed
+                    if (data.profile && data.profile.profile_picture) {
+                        const profileAvatar = document.querySelector('.profile-avatar');
+                        profileAvatar.innerHTML = `<img src="{{ asset('storage/') }}/${data.profile.profile_picture}" alt="Profile Picture">`;
+                    }
+                    
+                    // Update progress circle with saved percentage
+                    if (data.completion_percentage) {
+                        const progressText = document.getElementById('progressText');
+                        const progressCircle = document.getElementById('progressCircle');
+                        
+                        progressText.textContent = data.completion_percentage + '%';
+                        
+                        // Update circle visual
+                        const degrees = (data.completion_percentage / 100) * 360;
+                        progressCircle.style.background = `conic-gradient(#00A88F 0deg ${degrees}deg, #e5e7eb ${degrees}deg 360deg)`;
+                    }
+                    
+                    setTimeout(() => {
+                        saveBtn.textContent = 'Save';
+                        saveBtn.disabled = false;
+                        saveBtn.style.background = '#00A88F';
+                        location.reload(); // Reload to show updated data
+                    }, 2000);
+                } else {
+                    saveBtn.textContent = 'Error - Try Again';
+                    saveBtn.style.background = '#ef4444';
+                    setTimeout(() => {
+                        saveBtn.textContent = 'Save';
+                        saveBtn.disabled = false;
+                        saveBtn.style.background = '#00A88F';
+                    }, 3000);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                saveBtn.textContent = 'Error - Try Again';
+                saveBtn.style.background = '#ef4444';
                 setTimeout(() => {
-                    this.textContent = 'Save';
-                    this.disabled = false;
-                    this.style.background = '#00A88F';
-                }, 2000);
-            }, 1500);
+                    saveBtn.textContent = 'Save';
+                    saveBtn.disabled = false;
+                    saveBtn.style.background = '#00A88F';
+                }, 3000);
+            });
         });
 
         // Handle sidebar navigation
@@ -711,55 +1004,6 @@
                 document.querySelectorAll('.sidebar-icon').forEach(i => i.classList.remove('active'));
                 this.classList.add('active');
             });
-        });
-
-        // Handle Edit Profile button
-        document.querySelector('.btn-edit').addEventListener('click', function() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*';
-            
-            input.addEventListener('change', function(e) {
-                if (e.target.files.length > 0) {
-                    const file = e.target.files[0];
-                    const reader = new FileReader();
-                    
-                    reader.onload = function(e) {
-                        const profileAvatar = document.querySelector('.profile-avatar');
-                        profileAvatar.innerHTML = `<img src="${e.target.result}" alt="Profile Picture">`;
-                    };
-                    
-                    reader.readAsDataURL(file);
-                }
-            });
-            
-            input.click();
-        });
-
-        // Handle Edit Banner button
-        document.querySelectorAll('.btn-edit')[1].addEventListener('click', function() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*';
-            
-            input.addEventListener('change', function(e) {
-                if (e.target.files.length > 0) {
-                    const file = e.target.files[0];
-                    const reader = new FileReader();
-                    
-                    reader.onload = function(e) {
-                        const profileHeader = document.querySelector('.profile-header');
-                        profileHeader.style.background = `url(${e.target.result})`;
-                        profileHeader.style.backgroundSize = 'cover';
-                        profileHeader.style.backgroundPosition = 'center';
-                        profileHeader.style.backgroundRepeat = 'no-repeat';
-                    };
-                    
-                    reader.readAsDataURL(file);
-                }
-            });
-            
-            input.click();
         });
     </script>
 </body>

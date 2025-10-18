@@ -27,7 +27,7 @@ class LoginController extends Controller
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
 
-            return redirect()->route('landingpage2')
+            return redirect()->route('jobs')
                 ->with('success', 'Login berhasil! Selamat datang ' . $user->fisrt_name);
         }
 
