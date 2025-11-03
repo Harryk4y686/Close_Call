@@ -9,6 +9,7 @@ use App\Http\Controllers\Auth\EmailVerificationController as CustomEmailVerifica
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TestRelationController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\EventController;
 use App\Mail\VerifyEmailUser;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
@@ -44,10 +45,37 @@ Route::get('/jobs', function () {
     return view('jobs', compact('user', 'profile'));
 })->middleware(['auth'])->name('jobs');
  
-// (testing) halaman events
-Route::get('/events', function () {
-    return view('events');
-})->name('events');
+// Events routes (protected - requires authentication)
+Route::middleware(['auth'])->group(function () {
+    // Main events page
+    Route::get('/events', [EventController::class, 'index'])->name('events');
+    
+    // See all events page
+    Route::get('/events/all/list', [EventController::class, 'showAll'])->name('events.all');
+    
+    // Create new event page (form)
+    Route::get('/events/create', [EventController::class, 'create'])->name('events.create');
+    
+    // Store new event
+    Route::post('/events/store', [EventController::class, 'store'])->name('events.store');
+    
+    // View specific event page
+    Route::get('/events/{id}', [EventController::class, 'show'])->name('events.view');
+    
+    // Edit event
+    Route::get('/events/{id}/edit', [EventController::class, 'edit'])->name('events.edit');
+    Route::put('/events/{id}', [EventController::class, 'update'])->name('events.update');
+    
+    // Delete event
+    Route::delete('/events/{id}', [EventController::class, 'destroy'])->name('events.destroy');
+    
+    // Attend/Cancel attendance
+    Route::post('/events/{id}/attend', [EventController::class, 'attend'])->name('events.attend');
+    Route::post('/events/{id}/cancel-attendance', [EventController::class, 'cancelAttendance'])->name('events.cancel');
+    
+    // Get events by date (AJAX)
+    Route::get('/api/events/by-date', [EventController::class, 'getEventsByDate'])->name('events.by.date');
+});
  
 // Chat routes (protected - requires authentication)
 Route::middleware(['auth'])->group(function () {
@@ -64,9 +92,19 @@ Route::get('/AI', function () {
 })->name('AI');
 
 // (testing) halaman bestpartner
-Route::get('/bestpartnerjob ', function () {
+Route::get('/bestpartnerjob', function () {
     return view('bestpartnerjob');
 })->name('bestpartnerjob');
+
+// bestpartner page
+Route::get('/bestpartner', function () {
+    return view('bestpartner');
+})->name('bestpartner');
+
+// about bestpartner page
+Route::get('/aboutbestpartner', function () {
+    return view('aboutbestpartner');
+})->name('aboutbestpartner');
 
 // halaman register
 Route::get('/register', [UserRegistrationController::class, 'showRegistrationForm'])->name('register');

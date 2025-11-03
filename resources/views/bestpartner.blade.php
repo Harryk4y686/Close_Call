@@ -4,14 +4,157 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Best Partner Jobs - CloseCall</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Poppins', sans-serif;
             background-color: #f0f2f5;
             margin: 0;
             padding: 0;
+            overflow-x: hidden;
         }
+        
+        /* Keyframe Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        @keyframes slideInFromTop {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+        
+        @keyframes shimmer {
+            0% {
+                background-position: -200px 0;
+            }
+            100% {
+                background-position: calc(200px + 100%) 0;
+            }
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 53%, 80%, 100% {
+                transform: translate3d(0,0,0);
+            }
+            40%, 43% {
+                transform: translate3d(0, -8px, 0);
+            }
+            70% {
+                transform: translate3d(0, -4px, 0);
+            }
+            90% {
+                transform: translate3d(0, -2px, 0);
+            }
+        }
+        
+        /* Animation Classes */
+        .animate-fadeInUp {
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+        
+        .animate-fadeInLeft {
+            animation: fadeInLeft 0.8s ease-out forwards;
+        }
+        
+        .animate-fadeInRight {
+            animation: fadeInRight 0.8s ease-out forwards;
+        }
+        
+        .animate-scaleIn {
+            animation: scaleIn 0.6s ease-out forwards;
+        }
+        
+        .animate-slideInFromTop {
+            animation: slideInFromTop 0.8s ease-out forwards;
+        }
+        
+        .animate-pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .animate-bounce {
+            animation: bounce 1s infinite;
+        }
+        
+        /* Staggered Animation Delays */
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-300 { animation-delay: 0.3s; }
+        .delay-400 { animation-delay: 0.4s; }
+        .delay-500 { animation-delay: 0.5s; }
+        .delay-600 { animation-delay: 0.6s; }
+        .delay-700 { animation-delay: 0.7s; }
+        .delay-800 { animation-delay: 0.8s; }
         
         /* Header styles from jobs.blade.php */
         .header {
@@ -28,6 +171,13 @@
             gap: 1rem;
             margin-left: 0px;
             padding-left: 129px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .header:hover {
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
         }
         .location-selector {
             display: flex;
@@ -39,6 +189,14 @@
             font-size: 14px;
             font-weight: 500;
             gap: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .location-selector:hover {
+            background: #008B7A;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 168, 143, 0.3);
         }
         .search-bar {
             display: flex;
@@ -49,6 +207,36 @@
             width: 504px;
             border: 1px solid #000000;
             height: 40px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .search-bar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border-color: #00A88F;
+        }
+        
+        .search-bar:focus-within {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 168, 143, 0.2);
+            border-color: #00A88F;
+        }
+        
+        .search-bar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 168, 143, 0.1), transparent);
+            transition: left 0.5s;
+        }
+        
+        .search-bar:hover::before {
+            left: 100%;
         }
         .search-bar input {
             border: none;
@@ -99,9 +287,28 @@
             background: linear-gradient(135deg, #a8d5ba 0%, #7eb3d3 100%);
             border-radius: 16px;
             padding: 24px;
-            margin-bottom: 0px;
+            margin-bottom: 50px;
             position: relative;
             min-height: 200px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .job-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: rotate(45deg);
+            animation: shimmer 3s infinite;
+        }
+        
+        .job-header:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
         }
         
         .job-company-info {
@@ -138,14 +345,21 @@
         }
         
         .company-logo {
-            width: 120px;
-            height: 120px;
+            width: 172px;
+            height: 172px;
             border-radius: 50%;
             border: 4px solid white;
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
             object-fit: cover;
-            margin-top: -60px;
+            margin-top: -140px;
             margin-bottom: 10px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .company-logo:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
         
         .company-details h3 {
@@ -157,7 +371,7 @@
         
         .company-location {
             color: #666;
-            font-size: 14px;
+            font-size: 16px;
             margin-bottom: 8px;
         }
         
@@ -166,15 +380,8 @@
             align-items: center;
             gap: 8px;
             color: #00A88F;
-            font-size: 13px;
+            font-size: 16px;
             font-weight: 500;
-        }
-        
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            background: #00A88F;
-            border-radius: 50%;
         }
         
         .apply-btn {
@@ -185,12 +392,35 @@
             border: none;
             font-weight: 600;
             cursor: pointer;
-            transition: background 0.3s ease;
+            transition: all 0.3s ease;
             width: 200px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .apply-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
         }
         
         .apply-btn:hover {
             background: #008B7A;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 168, 143, 0.3);
+        }
+        
+        .apply-btn:hover::before {
+            left: 100%;
+        }
+        
+        .apply-btn:active {
+            transform: translateY(0);
         }
         
         .options-btn {
@@ -284,8 +514,34 @@
             color: #555;
             padding: 6px 16px;
             border-radius: 20px;
-            font-size: 13px;
+            font-size: 16px;
             font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .tag::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 168, 143, 0.1), transparent);
+            transition: left 0.3s;
+        }
+        
+        .tag:hover {
+            background: #00A88F;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 168, 143, 0.3);
+        }
+        
+        .tag:hover::before {
+            left: 100%;
         }
         
         .job-content {
@@ -399,25 +655,30 @@
             padding: 16px;
             margin-bottom: 12px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-            transition: transform 0.2s ease;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .related-job-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 168, 143, 0.05), transparent);
+            transition: left 0.5s;
         }
         
         .related-job-card:hover {
-            transform: translateY(-2px);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
         }
         
-        .related-job-card.hiding {
-            opacity: 0;
-            max-height: 0;
-            padding-top: 0;
-            padding-bottom: 0;
-            margin-bottom: 0;
-            transform: translateX(-20px);
-            transition: all 0.3s ease-out;
-        }
-        
-        .related-job-card.hidden {
-            display: none;
+        .related-job-card:hover::before {
+            left: 100%;
         }
         
         .related-job-logo {
@@ -465,11 +726,33 @@
             color: white;
             font-size: 18px;
             cursor: pointer;
-            transition: background 0.3s ease;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .apply-icon::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.3s ease;
         }
         
         .apply-icon:hover {
             background: #008B7A;
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(0, 168, 143, 0.4);
+        }
+        
+        .apply-icon:hover::before {
+            width: 100%;
+            height: 100%;
         }
         
         .see-all-link {
@@ -690,27 +973,27 @@
     <!-- Main Content -->
     <div class="main-content">
         <!-- Header -->
-        <div class="header">
-            <div class="location-selector">
+        <div class="header animate-slideInFromTop">
+            <div class="location-selector animate-fadeInLeft delay-200">
                 <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
                 </svg>
                 Indonesia
             </div>
             
-            <div class="search-bar">
+            <div class="search-bar animate-fadeInUp delay-300">
                 <svg width="18" height="18" fill="#6b7280" viewBox="0 0 24 24">
                     <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
                 </svg>
-                <input type="text" placeholder="Search jobs...">
+                <input type="text" placeholder="Title, skill, or company...">
             </div>
 
-            <a href="#" class="notification-icon">
+            <a href="#" class="notification-icon animate-fadeInRight delay-400">
                 <svg width="18" height="18" fill="#6b7280" viewBox="0 0 24 24">
                     <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
                 </svg>
             </a>
-            <a href="{{ route('profile') }}" class="avatar-icon">
+            <a href="{{ route('profile') }}" class="avatar-icon animate-fadeInRight delay-500">
                 <svg width="18" height="18" fill="#6b7280" viewBox="0 0 24 24">
                     <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                 </svg>
@@ -720,23 +1003,25 @@
         <!-- Content -->
         <div class="content-wrapper">
             <!-- Job Header with Background -->
-            <div class="job-header"></div>
+            <div class="job-header animate-fadeInUp delay-100"></div>
             
             <!-- Job Company Info -->
-            <div class="job-company-info">
+            <div class="job-company-info animate-scaleIn delay-200">
                 <div class="company-header">
                     <div class="company-left">
-                        <img src="{{ asset('image/socialmediamanager.png') }}" alt="Best Partner Education" class="company-logo">
-                        <div class="company-details">
-                            <h3>Best Partner Education</h3>
+                        <img src="{{ asset('image/socialmediamanager.png') }}" alt="Best Partner Education" class="company-logo animate-float">
+                        <div class="company-details animate-fadeInLeft delay-300">
+                            <h3 style="font-size: 24px">Best Partner Education</h3>
                             <div class="company-location">Indonesia | Best Partner Education</div>
                             <div class="company-status">
-                                <div class="status-dot"></div>
+                                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                            </svg>
                                 Actively reviewing applications
                             </div>
                         </div>
                     </div>
-                    <div class="header-buttons">
+                    <div class="header-buttons animate-fadeInRight delay-400">
                         <button class="apply-btn">Apply</button>
                         <button class="options-btn" id="optionsBtn">⋮</button>
                         <div class="options-dropdown" id="optionsDropdown">
@@ -768,16 +1053,16 @@
                     </div>
                 </div>
                 
-                <h1 class="job-title">Social Media Manager</h1>
+                <h1 class="job-title animate-fadeInUp delay-500">Social Media Manager</h1>
                 
-                <div class="job-tags">
+                <div class="job-tags animate-fadeInUp delay-600">
                     <span class="tag">#remote</span>
                     <span class="tag">#design</span>
                     <span class="tag">#socialmedia</span>
                     <span class="tag">#activelyreviewing</span>
                 </div>
                 
-                <div class="job-content">
+                <div class="job-content animate-fadeInUp delay-700">
                     <h4>Job Description</h4>
                     
                     <p><strong>Vector Illustrator (Badge Art Concept - Gamification Project)</strong></p>
@@ -805,11 +1090,11 @@
             </div>
             
             <!-- About the Company -->
-            <div class="about-company">
+            <div class="about-company animate-fadeInUp delay-800">
                 <h3 class="about-company-title">About the Company</h3>
                 
                 <div class="about-header">
-                    <img src="{{ asset('image/socialmediamanager.png') }}" alt="Best Partner Education" class="company-logo" style="width: 48px; height: 48px;">
+                    <img src="{{ asset('image/socialmediamanager.png') }}" alt="Best Partner Education" class="company-logo" style="width: 65px; height: 65px; margin-top: 0.5px">
                     <div>
                         <h4>Best Partner Education</h4>
                         <div class="company-stats">37,000 followers<br>Education, International Studies | 50-100 employees | 349 on CloseCall</div>
@@ -826,49 +1111,55 @@
             </div>
             
             <!-- Related Jobs -->
-            <div class="related-jobs">
+            <div class="related-jobs animate-fadeInUp delay-800">
                 <h3>Related Jobs</h3>
                 
-                <div class="related-job-card">
+                <div class="related-job-card animate-fadeInLeft delay-900">
                     <img src="{{ asset('image/dataanalyst.png') }}" alt="Data Analyst" class="related-job-logo">
                     <div class="related-job-info">
                         <div class="related-job-title">Data Analyst</div>
                         <div class="related-job-company">Indonesia | GRHA Digital</div>
                         <div class="related-job-status">
-                            <div class="status-dot"></div>
+                                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                            </svg>
                             Actively reviewing applications
                         </div>
                     </div>
                     <div class="apply-icon">×</div>
                 </div>
                 
-                <div class="related-job-card">
+                <div class="related-job-card animate-fadeInUp delay-1000">
                     <img src="{{ asset('image/socialmediamanager.png') }}" alt="Social Media Manager" class="related-job-logo">
                     <div class="related-job-info">
                         <div class="related-job-title">Social Media Manager</div>
                         <div class="related-job-company">Indonesia | Best Partner Education</div>
                         <div class="related-job-status">
-                            <div class="status-dot"></div>
+                                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                            </svg>
                             Actively reviewing applications
                         </div>
                     </div>
                     <div class="apply-icon">×</div>
                 </div>
                 
-                <div class="related-job-card">
+                <div class="related-job-card animate-fadeInRight delay-1100">
                     <img src="{{ asset('image/mechanicalengineer.png') }}" alt="Mechanical Engineer" class="related-job-logo">
                     <div class="related-job-info">
                         <div class="related-job-title">Mechanical Engineer</div>
                         <div class="related-job-company">Indonesia | R-Tech Computer</div>
                         <div class="related-job-status">
-                            <div class="status-dot"></div>
+                                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                            </svg>
                             Actively reviewing applications
                         </div>
                     </div>
                     <div class="apply-icon">×</div>
                 </div>
                 
-                <div class="see-all-link">See all</div>
+                <div class="see-all-link animate-fadeInUp delay-1200">See all</div>
             </div>
         </div>
     </div>
@@ -891,17 +1182,9 @@
             });
         });
 
-        // Handle Apply button
+        // Handle Apply button - redirect to bestpartnerjob
         document.querySelector('.apply-btn').addEventListener('click', function() {
-            this.textContent = 'Applied!';
-            this.style.background = '#10b981';
-            this.disabled = true;
-            
-            setTimeout(() => {
-                this.textContent = 'Apply';
-                this.style.background = '#00A88F';
-                this.disabled = false;
-            }, 3000);
+            window.location.href = '{{ route("bestpartnerjob") }}';
         });
 
         // Handle Options button dropdown
@@ -955,76 +1238,32 @@
             });
         }
 
-        // Handle Show More link
+        // Handle Show More link - Navigate to bestpartnerjob page
         document.querySelector('.show-more').addEventListener('click', function(e) {
-            // For now, prevent default and show expanded text
-            // Later you can replace this with actual navigation
             e.preventDefault();
             
-            const description = document.querySelector('.company-description');
-            const fullText = `Best Partner is revolutionizing hiring with the world's first and only end-to-end AI recruiting platform. Trained with human insights and proprietary data, this reduces time to hire from months to days, instantly matching you with pre-vetted qualified candidates, and conducting the first round phone screen for you. Trusted by hundreds of Fortune 1000 enterprises including Nestlé, Porsche, Atlassian, Goldman Sachs, and Nike, Braintrust AIR is making talent acquisition professionals 10x more effective and saving companies hundreds of thousands of dollars in recruiting costs.
-
-Our mission is to democratize access to talent by creating a more efficient, transparent, and inclusive hiring process. We believe that the best candidates should have access to the best opportunities, regardless of their background or network.
-
-With our AI-powered platform, we're not just changing how companies hire - we're transforming careers and creating opportunities for professionals worldwide.`;
-            
-            if (this.textContent === 'Show more...') {
-                description.textContent = fullText;
-                this.textContent = 'Show less...';
-            } else {
-                description.textContent = description.textContent.substring(0, 400) + '...';
-                this.textContent = 'Show more...';
-            }
-            
-            // Uncomment below when you have the actual page to navigate to
-            // window.location.href = '/company/best-partner-education';
+            // Navigate to the bestpartnerjob page
+            window.location.href = "{{ route('bestpartnerjob') }}";
         });
 
-        // Handle Related Job Apply Icons (Delete functionality)
+        // Handle Related Job Apply Icons - redirect to bestpartnerjob
         document.querySelectorAll('.apply-icon').forEach(icon => {
-            icon.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation(); // Prevent card click event
-                
-                const jobCard = this.closest('.related-job-card');
-                hideJobCard(jobCard);
+            icon.addEventListener('click', function() {
+                window.location.href = '{{ route("bestpartnerjob") }}';
             });
         });
 
-        // Function to hide job card with smooth animation
-        function hideJobCard(jobCard) {
-            if (!jobCard) return;
-            
-            // Add hiding class for animation
-            jobCard.classList.add('hiding');
-            
-            // After animation completes, fully hide the element
-            setTimeout(() => {
-                jobCard.classList.add('hidden');
-                jobCard.classList.remove('hiding');
-                
-                // Optional: Log for debugging
-                const jobTitle = jobCard.querySelector('.related-job-title')?.textContent || 'Unknown Job';
-                console.log('Hidden job:', jobTitle);
-            }, 300); // Match the CSS transition duration
-        }
-
-        // Handle Related Job Cards Click
+        // Handle Related Job Cards Click - redirect to bestpartnerjob
         document.querySelectorAll('.related-job-card').forEach(card => {
             card.addEventListener('click', function(e) {
-                // Don't trigger if clicking the apply icon
-                if (!e.target.closest('.apply-icon')) {
-                    console.log('Navigate to job:', this.querySelector('.related-job-title').textContent);
-                    // Here you can add navigation logic
-                }
+                window.location.href = '{{ route("bestpartnerjob") }}';
             });
         });
 
-        // Handle Tag clicks
+        // Handle Tag clicks - redirect to bestpartnerjob
         document.querySelectorAll('.tag').forEach(tag => {
             tag.addEventListener('click', function() {
-                console.log('Search for tag:', this.textContent);
-                // Here you can add search functionality
+                window.location.href = '{{ route("bestpartnerjob") }}';
             });
         });
 
@@ -1032,6 +1271,106 @@ With our AI-powered platform, we're not just changing how companies hire - we're
         window.addEventListener('load', function() {
             window.scrollTo({top: 0, behavior: 'smooth'});
         });
+
+        // Intersection Observer for scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe elements for scroll animations
+        document.querySelectorAll('.animate-fadeInUp, .animate-fadeInLeft, .animate-fadeInRight, .animate-scaleIn').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            observer.observe(el);
+        });
+
+        // Add parallax effect to job header
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const jobHeader = document.querySelector('.job-header');
+            if (jobHeader) {
+                jobHeader.style.transform = `translateY(${scrolled * 0.5}px)`;
+            }
+        });
+
+        // Add typing effect to job title
+        function typeWriter(element, text, speed = 100) {
+            let i = 0;
+            element.innerHTML = '';
+            function type() {
+                if (i < text.length) {
+                    element.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                }
+            }
+            type();
+        }
+
+        // Initialize typing effect after page load
+        setTimeout(() => {
+            const jobTitle = document.querySelector('.job-title');
+            if (jobTitle) {
+                const originalText = jobTitle.textContent;
+                typeWriter(jobTitle, originalText, 50);
+            }
+        }, 1000);
+
+        // Add ripple effect to buttons
+        function createRipple(event) {
+            const button = event.currentTarget;
+            const circle = document.createElement('span');
+            const diameter = Math.max(button.clientWidth, button.clientHeight);
+            const radius = diameter / 2;
+
+            circle.style.width = circle.style.height = `${diameter}px`;
+            circle.style.left = `${event.clientX - button.offsetLeft - radius}px`;
+            circle.style.top = `${event.clientY - button.offsetTop - radius}px`;
+            circle.classList.add('ripple');
+
+            const ripple = button.getElementsByClassName('ripple')[0];
+            if (ripple) {
+                ripple.remove();
+            }
+
+            button.appendChild(circle);
+        }
+
+        // Add ripple effect to all buttons
+        document.querySelectorAll('.apply-btn, .tag, .apply-icon').forEach(button => {
+            button.addEventListener('click', createRipple);
+        });
+
+        // Add CSS for ripple effect
+        const style = document.createElement('style');
+        style.textContent = `
+            .ripple {
+                position: absolute;
+                border-radius: 50%;
+                background-color: rgba(255, 255, 255, 0.6);
+                transform: scale(0);
+                animation: ripple-animation 0.6s linear;
+                pointer-events: none;
+            }
+            
+            @keyframes ripple-animation {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>

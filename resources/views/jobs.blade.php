@@ -62,6 +62,76 @@
         .search-bar input::placeholder {
             color: #000000;
         }
+        
+        /* Search Results Dropdown */
+        .search-container {
+            position: relative;
+            width: 504px;
+        }
+        
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .search-results.show {
+            display: block;
+        }
+        
+        .search-result-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f3f4f6;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        
+        .search-result-item:hover {
+            background-color: #f9fafb;
+        }
+        
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+        
+        .search-result-title {
+            color: #1a0dab;
+            font-size: 18px;
+            font-weight: 400;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 4px;
+        }
+        
+        .search-result-title:hover {
+            text-decoration: underline;
+        }
+        
+        .search-result-url {
+            color: #006621;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+        
+        .search-result-description {
+            color: #545454;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        .search-result-highlight {
+            font-weight: bold;
+        }
         .notification-icon, .avatar-icon {
             width: 40px;
             height: 40px;
@@ -637,11 +707,16 @@
                 Indonesia
             </div>
             
-            <div class="search-bar">
-                <svg width="18" height="18" fill="#6b7280" viewBox="0 0 24 24">
-                    <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-                </svg>
-                <input type="text" placeholder="Title, skill, or company...">
+            <div class="search-container">
+                <div class="search-bar">
+                    <svg width="18" height="18" fill="#6b7280" viewBox="0 0 24 24">
+                        <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                    </svg>
+                    <input type="text" placeholder="Title, skill, or company..." id="searchInput">
+                </div>
+                <div class="search-results" id="searchResults">
+                    <!-- Search results will be populated here -->
+                </div>
             </div>
 
             <a href="#" class="notification-icon">
@@ -1155,6 +1230,107 @@
         window.addEventListener('focus', function() {
             updateJobsProgress();
         });
+
+        // SEO Search functionality
+        const searchInput = document.getElementById('searchInput');
+        const searchResults = document.getElementById('searchResults');
+        
+        if (searchInput && searchResults) {
+            // Search data - SEO-style results for "bestpartner"
+            const searchData = {
+                'bestpartner': [
+                    {
+                        title: 'Best Partner Education - About Us | CloseCall',
+                        url: 'closecall.com/aboutbestpartner',
+                        description: 'Learn more about <span class="search-result-highlight">Best Partner</span> Education, a leading educational institution providing quality education and career opportunities. Discover our mission, vision, and values.',
+                        route: '/aboutbestpartner'
+                    },
+                    {
+                        title: 'Best Partner Jobs - Career Opportunities | CloseCall',
+                        url: 'closecall.com/bestpartnerjob',
+                        description: 'Explore exciting career opportunities at <span class="search-result-highlight">Best Partner</span> Education. Find your dream job with competitive salaries and excellent benefits.',
+                        route: '/bestpartnerjob'
+                    },
+                    {
+                        title: 'Best Partner Company Profile | CloseCall',
+                        url: 'closecall.com/bestpartner',
+                        description: 'View the complete company profile of <span class="search-result-highlight">Best Partner</span> Education including company information, culture, and available positions.',
+                        route: '/bestpartner'
+                    }
+                ]
+            };
+            
+            // Search functionality
+            searchInput.addEventListener('input', function() {
+                const query = this.value.toLowerCase().trim();
+                
+                if (query === '') {
+                    hideSearchResults();
+                    return;
+                }
+                
+                // Check if query matches any search terms
+                const results = [];
+                for (const [key, items] of Object.entries(searchData)) {
+                    // Show results for any query containing "best" or "partner"
+                    if (query.includes('best') || query.includes('partner') || 
+                        query.includes('bestpartner') || key.includes(query)) {
+                        results.push(...items);
+                        break; // Only add once
+                    }
+                }
+                
+                if (results.length > 0) {
+                    showSearchResults(results, query);
+                } else {
+                    hideSearchResults();
+                }
+            });
+            
+            // Show search results
+            function showSearchResults(results, query) {
+                let html = '';
+                results.forEach(result => {
+                    // Highlight search term in title and description
+                    const highlightedTitle = result.title.replace(new RegExp(query, 'gi'), '<span class="search-result-highlight">$&</span>');
+                    const highlightedDescription = result.description; // Already has highlighting
+                    
+                    html += `
+                        <div class="search-result-item" onclick="navigateToResult('${result.route}')">
+                            <div class="search-result-title">${highlightedTitle}</div>
+                            <div class="search-result-url">${result.url}</div>
+                            <div class="search-result-description">${highlightedDescription}</div>
+                        </div>
+                    `;
+                });
+                
+                searchResults.innerHTML = html;
+                searchResults.classList.add('show');
+            }
+            
+            // Hide search results
+            function hideSearchResults() {
+                searchResults.classList.remove('show');
+                searchResults.innerHTML = '';
+            }
+            
+            // Navigate to result
+            window.navigateToResult = function(route) {
+                window.location.href = route;
+            };
+            
+            // Hide results when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.search-container')) {
+                    hideSearchResults();
+                }
+            });
+            
+            // Prevent hiding when clicking inside search container
+            document.querySelector('.search-container').addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        }
     </script>
 </body>
 </html>
