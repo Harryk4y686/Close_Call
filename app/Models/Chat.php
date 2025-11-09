@@ -24,12 +24,46 @@ class Chat extends Model
 
     public function sender()
     {
+        // Try to find in Pengguna first, then fallback to User
+        $pengguna = \App\Models\Pengguna::find($this->sender_id);
+        if ($pengguna) {
+            return $this->belongsTo(\App\Models\Pengguna::class, 'sender_id');
+        }
         return $this->belongsTo(User::class, 'sender_id');
     }
 
     public function receiver()
     {
+        // Try to find in Pengguna first, then fallback to User
+        $pengguna = \App\Models\Pengguna::find($this->receiver_id);
+        if ($pengguna) {
+            return $this->belongsTo(\App\Models\Pengguna::class, 'receiver_id');
+        }
         return $this->belongsTo(User::class, 'receiver_id');
+    }
+
+    /**
+     * Get sender user (works with both User and Pengguna)
+     */
+    public function getSenderUser()
+    {
+        $pengguna = \App\Models\Pengguna::find($this->sender_id);
+        if ($pengguna) {
+            return $pengguna;
+        }
+        return User::find($this->sender_id);
+    }
+
+    /**
+     * Get receiver user (works with both User and Pengguna)
+     */
+    public function getReceiverUser()
+    {
+        $pengguna = \App\Models\Pengguna::find($this->receiver_id);
+        if ($pengguna) {
+            return $pengguna;
+        }
+        return User::find($this->receiver_id);
     }
 
     public function scopeBetweenUsers($query, $user1Id, $user2Id)

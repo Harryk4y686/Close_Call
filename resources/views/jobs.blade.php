@@ -13,11 +13,14 @@
             padding: 0;
         }
         
-        /* Header styles from profile.blade.php */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Header styles - removed white background */
         .header {
-            background: white;
+            background: transparent;
             padding: 1rem 2rem;
-            border-bottom: 1px solid #e5e7eb;
             display: flex;
             justify-content: flex-end;
             align-items: center;
@@ -71,18 +74,29 @@
         
         .search-results {
             position: absolute;
-            top: 100%;
+            top: calc(100% + 8px);
             left: 0;
             right: 0;
             background: white;
             border: 1px solid #e5e7eb;
-            border-top: none;
-            border-radius: 0 0 12px 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            max-height: 400px;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0, 168, 143, 0.15), 0 2px 8px rgba(0, 0, 0, 0.08);
+            max-height: 450px;
             overflow-y: auto;
             z-index: 1000;
             display: none;
+            animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
         .search-results.show {
@@ -90,47 +104,86 @@
         }
         
         .search-result-item {
-            padding: 12px 16px;
-            border-bottom: 1px solid #f3f4f6;
+            padding: 18px 20px;
+            border-bottom: 1px solid #f0f2f5;
             cursor: pointer;
-            transition: background-color 0.2s ease;
+            transition: all 0.25s ease;
+            position: relative;
+        }
+        
+        .search-result-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 0;
+            background: linear-gradient(to right, #00A88F, transparent);
+            transition: width 0.3s ease;
         }
         
         .search-result-item:hover {
-            background-color: #f9fafb;
+            background: linear-gradient(to right, #f0fdf4 0%, #ffffff 100%);
+            transform: translateX(4px);
+        }
+        
+        .search-result-item:hover::before {
+            width: 4px;
         }
         
         .search-result-item:last-child {
             border-bottom: none;
+            border-radius: 0 0 16px 16px;
+        }
+        
+        .search-result-item:first-child {
+            border-radius: 16px 16px 0 0;
         }
         
         .search-result-title {
-            color: #1a0dab;
-            font-size: 18px;
-            font-weight: 400;
-            text-decoration: none;
-            display: block;
-            margin-bottom: 4px;
+            color: #1f2937;
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            line-height: 1.4;
+            transition: color 0.2s ease;
         }
         
-        .search-result-title:hover {
-            text-decoration: underline;
+        .search-result-item:hover .search-result-title {
+            color: #00A88F;
         }
         
         .search-result-url {
-            color: #006621;
-            font-size: 14px;
-            margin-bottom: 4px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #00A88F;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            padding: 4px 10px;
+            background: #f0fdf4;
+            border-radius: 6px;
+            width: fit-content;
+        }
+        
+        .search-result-url::before {
+            content: '🔗';
+            font-size: 12px;
         }
         
         .search-result-description {
-            color: #545454;
+            color: #6b7280;
             font-size: 14px;
-            line-height: 1.4;
+            line-height: 1.6;
         }
         
         .search-result-highlight {
-            font-weight: bold;
+            color: #00A88F;
+            font-weight: 600;
+            background: #dcfce7;
+            padding: 2px 4px;
+            border-radius: 4px;
         }
         .notification-icon, .avatar-icon {
             width: 40px;
@@ -179,57 +232,41 @@
             color: #1f2937;
         }
         
-        /* Complete Profile Section */
-        .complete-profile {
-            background: white;
-            border-radius: 16px;
-            padding: 24px;
+        /* Profile Ready Notification */
+        .profile-ready-notification {
+            text-align: center;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border-radius: 12px;
+            border: 2px solid #00A88F;
             margin-bottom: 32px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 168, 143, 0.1);
         }
-        .complete-title {
-            font-size: 20px;
+        .profile-ready-title {
+            margin: 0;
+            font-size: 18px;
             font-weight: 700;
-            margin-bottom: 12px;
-            color: #1f2937;
+            color: #00A88F;
         }
-        .complete-text {
+        .profile-ready-text {
+            margin: 0.75rem 0;
             font-size: 14px;
-            color: #6b7280;
-            margin-bottom: 16px;
-            line-height: 1.6;
+            color: #374151;
+            line-height: 1.5;
         }
-        .progress-container {
-            margin-bottom: 16px;
-        }
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: #e5e7eb;
-            border-radius: 4px;
-            overflow: hidden;
-            margin-bottom: 16px;
-        }
-        .progress-fill {
-            width: 50%;
-            height: 100%;
-            background: linear-gradient(to right, #00A88F, #38b2ac);
-            transition: width 0.3s ease;
-        }
-        .complete-btn {
+        .profile-ready-btn {
+            display: inline-block;
+            margin-top: 0.5rem;
+            padding: 12px 24px;
             background: #00A88F;
             color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 24px;
+            text-decoration: none;
+            border-radius: 8px;
             font-weight: 600;
-            cursor: pointer;
+            font-size: 14px;
             transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
         }
-        .complete-btn:hover {
+        .profile-ready-btn:hover {
             background: #008B7A;
         }
         
@@ -679,9 +716,9 @@
 <body>
     <!-- Left Sidebar -->
     <div class="sidebar">
-        <div class="sidebar-logo">
+        <a href="{{ route('landing-page') }}" class="sidebar-logo">
             <img src="{{ asset('image/logo.png') }}" alt="CloseCall Logo" class="logo-img">
-        </div>
+        </a>
         <a href="{{ route('profile') }}" class="sidebar-icon" data-page="home">
             <img src="{{ asset('image/home.png') }}" alt="Home" class="sidebar-icon-img">
         </a>
@@ -690,6 +727,9 @@
         </a>
         <a href="{{ route('events') }}" class="sidebar-icon" data-page="events">
             <img src="{{ asset('image/events.png') }}" alt="Events" class="sidebar-icon-img">
+        </a>
+        <a href="{{ route('chats') }}" class="sidebar-icon" data-page="chats">
+            <img src="{{ asset('image/chats.png') }}" alt="Chats" class="sidebar-icon-img">
         </a>
         <a href="{{ route('AI') }}" class="sidebar-icon" data-page="AI">
             <img src="{{ asset('image/genius.png') }}" alt="AI" class="sidebar-icon-img">
@@ -764,28 +804,17 @@
                 </div>
             @endif
 
-            <!-- Complete your Profile Section -->
-            <div class="complete-profile">
-                <h2 class="complete-title">Complete your Profile first!</h2>
-                <p class="complete-text">You will need to complete your profile in order to apply for a job through this website. Once you're set up, you can browse the website as much as you want.</p>
-                
-                <div class="progress-container">
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="jobs-progress-fill" style="width: {{ isset($profile) && $profile->completion_percentage ? $profile->completion_percentage : 0 }}%;"></div>
-                    </div>
-                    <span id="jobs-progress-text" style="color: #00A88F; font-weight: 600;">{{ isset($profile) && $profile->completion_percentage ? $profile->completion_percentage : 0 }}%</span>
-                </div>
-                
-                <a href="{{ route('profile') }}" class="complete-btn">
-                    Complete Profile
-                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
-                    </svg>
+            <!-- Profile Ready Notification -->
+            <div class="profile-ready-notification">
+                <p class="profile-ready-title">Your profile is ready!</p>
+                <p class="profile-ready-text">Now you can start exploring job opportunities and connect with employers.</p>
+                <a href="#jobs-section" class="profile-ready-btn">
+                    Explore Jobs →
                 </a>
             </div>
 
             <!-- Job Categories Section - Same as landingpage.blade.php -->
-            <h2 class="section-title text-left">Job Categories</h2>
+            <h2 class="section-title text-left" id="jobs-section">Job Categories</h2>
             
             <div class="categories-grid grid grid-cols-4 gap-5">
                 <div class="category-card">
@@ -1074,10 +1103,14 @@
             });
         });
 
-        // Handle complete profile button
-        document.querySelector('.complete-btn').addEventListener('click', function() {
-            window.location.href = '/profile';
-        });
+        // Handle profile ready button (only if it exists)
+        const profileBtn = document.querySelector('.profile-ready-btn');
+        if (profileBtn) {
+            profileBtn.addEventListener('click', function(e) {
+                // Allow default behavior for anchor links (like #jobs-section)
+                // Only prevent default if we need custom navigation
+            });
+        }
 
         // Handle suggested tags
         document.querySelectorAll('.tag').forEach(tag => {

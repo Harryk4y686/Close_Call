@@ -84,9 +84,8 @@
             min-height: 100vh;
         }
         .header {
-            background: white;
+            background: transparent;
             padding: 1rem 2rem;
-            border-bottom: 1px solid #e5e7eb;
             display: flex;
             justify-content: flex-end;
             align-items: center;
@@ -159,7 +158,11 @@
             margin-left: 30px;
         }
         .profile-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            @if(isset($profile) && $profile->banner_image)
+                background: url('{{ asset('storage/' . $profile->banner_image) }}');
+            @else
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            @endif
             border-radius: 12px;
             padding: 2rem;
             margin-bottom: 2rem;
@@ -422,9 +425,9 @@
 <body>
     <!-- Left Sidebar -->
     <div class="sidebar">
-        <div class="sidebar-logo">
+        <a href="{{ route('landing-page') }}" class="sidebar-logo">
             <img src="{{ asset('image/logo.png') }}" alt="CloseCall Logo" class="logo-img">
-        </div>
+        </a>
         <a href="{{ route('profile') }}" class="sidebar-icon active" data-page="home">
             <img src="{{ asset('image/home.png') }}" alt="Home" class="sidebar-icon-img">
         </a>
@@ -458,11 +461,36 @@
                 </svg>
             </a>
             <a href="{{ route('profile') }}" class="avatar-icon">
-                <svg width="18" height="18" fill="#6b7280" viewBox="0 0 24 24">
-                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                </svg>
+                @if(isset($profile) && $profile->profile_picture)
+                    <img src="{{ asset('storage/' . $profile->profile_picture) }}" alt="Profile" 
+                         style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"
+                         onerror="console.error('Failed to load profile image:', this.src); this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <svg width="18" height="18" fill="#6b7280" viewBox="0 0 24 24" style="display: none;">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
+                @else
+                    <svg width="18" height="18" fill="#6b7280" viewBox="0 0 24 24">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
+                @endif
             </a>
         </div>
+
+        <!-- Email Verification Notice -->
+        @if(!$user->verified)
+        <div style="background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 16px; margin: 20px; display: flex; align-items: center; gap: 12px;">
+            <svg width="24" height="24" fill="#f59e0b" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+            </svg>
+            <div>
+                <strong style="color: #92400e;">Email Verification Required</strong>
+                <p style="margin: 4px 0 0 0; color: #92400e; font-size: 14px;">
+                    Please verify your email address to update your profile and access all features. 
+                    <a href="{{ route('verification.notice') }}" style="color: #f59e0b; text-decoration: underline;">Click here to verify</a>
+                </p>
+            </div>
+        </div>
+        @endif
 
         <!-- Content Wrapper -->
         <div class="content-wrapper">
@@ -512,7 +540,7 @@
                         </div>
                         <div class="form-group">
                             <label><b>Date of Birth</b></label>
-                            <input type="date" id="date-of-birth" name="date_of_birth" placeholder="Select your date of birth" value="{{ $profile->date_of_birth ?? '' }}">
+                            <input type="date" id="date-of-birth" name="date_of_birth" placeholder="Select your date of birth" value="{{ isset($profile->date_of_birth) ? $profile->date_of_birth->format('Y-m-d') : '' }}">
                         </div>
                         <div class="form-group">
                             <label><b>Gender</b></label>
@@ -546,33 +574,33 @@
                     <div class="upload-section">
                         <h3 class="upload-title">Upload Your Resume</h3>
                         <div class="upload-container">
-                            <button type="button" class="upload-btn" data-target="resume-input">
+                            <button type="button" class="upload-btn {{ isset($profile) && $profile->resume_path ? 'file-selected' : '' }}" data-target="resume-input">
                                 <img src="{{ asset('image/upload.png') }}" alt="Resume Icon" class="upload-icon">
-                                <b>{{ isset($profile) && $profile->resume_path ? 'Change Resume' : 'Upload Resume' }}</b>
+                                <b>{{ isset($profile) && $profile->resume_path ? basename($profile->resume_path) : 'Upload Resume' }}</b>
                             </button>
-                            <button class="cancel-btn" style="display: none;" onclick="cancelFile(this)">×</button>
+                            <button type="button" class="cancel-btn" style="{{ isset($profile) && $profile->resume_path ? 'display: flex;' : 'display: none;' }}" onclick="return cancelFile(this, event);">×</button>
                         </div>
                     </div>
 
                     <div class="upload-section">
                         <h3 class="upload-title">Upload Your Curriculum Vitae</h3>
                         <div class="upload-container">
-                            <button type="button" class="upload-btn" data-target="cv-input">
+                            <button type="button" class="upload-btn {{ isset($profile) && $profile->cv_path ? 'file-selected' : '' }}" data-target="cv-input">
                                 <img src="{{ asset('image/upload.png') }}" alt="CV Icon" class="upload-icon">
-                                <b>{{ isset($profile) && $profile->cv_path ? 'Change CV' : 'Upload CV' }}</b>
+                                <b>{{ isset($profile) && $profile->cv_path ? basename($profile->cv_path) : 'Upload CV' }}</b>
                             </button>
-                            <button class="cancel-btn" style="display: none;" onclick="cancelFile(this)">×</button>
+                            <button type="button" class="cancel-btn" style="{{ isset($profile) && $profile->cv_path ? 'display: flex;' : 'display: none;' }}" onclick="return cancelFile(this, event);">×</button>
                         </div>
                     </div>
 
                     <div class="upload-section">
                         <h3 class="upload-title">Upload Your Portfolio</h3>
                         <div class="upload-container">
-                            <button type="button" class="upload-btn" data-target="portfolio-input">
+                            <button type="button" class="upload-btn {{ isset($profile) && $profile->portfolio_path ? 'file-selected' : '' }}" data-target="portfolio-input">
                                 <img src="{{ asset('image/upload.png') }}" alt="Portfolio Icon" class="upload-icon">
-                                <b>{{ isset($profile) && $profile->portfolio_path ? 'Change Portfolio' : 'Upload Portfolio' }}</b>
+                                <b>{{ isset($profile) && $profile->portfolio_path ? basename($profile->portfolio_path) : 'Upload Portfolio' }}</b>
                             </button>
-                            <button class="cancel-btn" style="display: none;" onclick="cancelFile(this)">×</button>
+                            <button type="button" class="cancel-btn" style="{{ isset($profile) && $profile->portfolio_path ? 'display: flex;' : 'display: none;' }}" onclick="return cancelFile(this, event);">×</button>
                         </div>
                     </div>
 
@@ -584,47 +612,72 @@
             <div class="right-sidebar">
                 <!-- Complete your Profile Section -->
                 <div class="completion-section">
-                    <h3 class="completion-title">Complete your Profile</h3>
-                    <div class="progress-circle" id="progressCircle">
-                        <span class="progress-text" id="progressText">{{ isset($profile) && $profile->completion_percentage ? $profile->completion_percentage : 0 }}%</span>
-                    </div>
-                    <ul class="completion-list">
-                        <li class="completion-item" id="photo-item">
-                            <div class="completion-status">
-                                <span class="x-icon" id="photo-icon">X</span>
-                                <span>Upload your Photo</span>
-                            </div>
-                            <span class="completion-percentage">20%</span>
-                        </li>
-                        <li class="completion-item" id="personal-info-item">
-                            <div class="completion-status">
-                                <span class="x-icon" id="personal-info-icon">X</span>
-                                <span>Personal Info</span>
-                            </div>
-                            <span class="completion-percentage">25%</span>
-                        </li>
-                        <li class="completion-item" id="location-item">
-                            <div class="completion-status">
-                                <span class="x-icon" id="location-icon">X</span>
-                                <span>Location</span>
-                            </div>
-                            <span class="completion-percentage">20%</span>
-                        </li>
-                        <li class="completion-item" id="resume-cv-item">
-                            <div class="completion-status">
-                                <span class="x-icon" id="resume-cv-icon">X</span>
-                                <span>Resume & CV</span>
-                            </div>
-                            <span class="completion-percentage">20%</span>
-                        </li>
-                        <li class="completion-item" id="portfolio-item">
-                            <div class="completion-status">
-                                <span class="x-icon" id="portfolio-icon">X</span>
-                                <span>Portfolio</span>
-                            </div>
-                            <span class="completion-percentage">15%</span>
-                        </li>
-                    </ul>
+                    @php
+                        $completionPercentage = isset($profile) && $profile->completion_percentage ? $profile->completion_percentage : 0;
+                        $isComplete = $completionPercentage >= 100;
+                    @endphp
+                    
+                    @if($isComplete)
+                        <!-- Profile Complete Message -->
+                        <h3 class="completion-title" style="color: #00A88F;">🎉 Profile Complete!</h3>
+                        <div class="progress-circle" id="progressCircle">
+                            <span class="progress-text" id="progressText" style="color: #00A88F;">100%</span>
+                        </div>
+                        <div style="text-align: center; padding: 1.5rem; background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: 12px; border: 2px solid #00A88F; margin-top: 1rem; box-shadow: 0 4px 12px rgba(0, 168, 143, 0.1);">
+                            <p style="margin: 0; font-size: 18px; font-weight: 700; color: #00A88F;">Your profile is ready!</p>
+                            <p style="margin: 0.75rem 0; font-size: 14px; color: #374151; line-height: 1.5;">Now you can start exploring job opportunities and connect with employers.</p>
+                            <a href="{{ route('jobs') }}" style="display: inline-block; margin-top: 0.5rem; padding: 12px 24px; background: #00A88F; color: white; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 14px; transition: all 0.3s;" onmouseover="this.style.background='#008B7A'" onmouseout="this.style.background='#00A88F'">
+                                Browse Jobs Now →
+                            </a>
+                        </div>
+                    @else
+                        <!-- Profile Completion Progress -->
+                        <h3 class="completion-title">Complete your Profile first!</h3>
+                        <div class="progress-circle" id="progressCircle">
+                            <span class="progress-text" id="progressText">{{ $completionPercentage }}%</span>
+                        </div>
+                        <p style="text-align: center; color: #6b7280; font-size: 14px; margin-bottom: 1rem;">You will need to complete your profile in order for you to browse the website. Once you've set it up, you can browse the website as much as you want.</p>
+                        <ul class="completion-list">
+                            <li class="completion-item" id="photo-item">
+                                <div class="completion-status">
+                                    <span class="x-icon" id="photo-icon">X</span>
+                                    <span>Upload your Photo</span>
+                                </div>
+                                <span class="completion-percentage">20%</span>
+                            </li>
+                            <li class="completion-item" id="personal-info-item">
+                                <div class="completion-status">
+                                    <span class="x-icon" id="personal-info-icon">X</span>
+                                    <span>Personal Info</span>
+                                </div>
+                                <span class="completion-percentage">25%</span>
+                            </li>
+                            <li class="completion-item" id="location-item">
+                                <div class="completion-status">
+                                    <span class="x-icon" id="location-icon">X</span>
+                                    <span>Location</span>
+                                </div>
+                                <span class="completion-percentage">20%</span>
+                            </li>
+                            <li class="completion-item" id="resume-cv-item">
+                                <div class="completion-status">
+                                    <span class="x-icon" id="resume-cv-icon">X</span>
+                                    <span>Resume & CV</span>
+                                </div>
+                                <span class="completion-percentage">20%</span>
+                            </li>
+                            <li class="completion-item" id="portfolio-item">
+                                <div class="completion-status">
+                                    <span class="x-icon" id="portfolio-icon">X</span>
+                                    <span>Portfolio</span>
+                                </div>
+                                <span class="completion-percentage">15%</span>
+                            </li>
+                        </ul>
+                        <button type="button" onclick="document.querySelector('.save-btn').scrollIntoView({ behavior: 'smooth', block: 'center' });" style="width: 100%; margin-top: 1rem; padding: 12px; background: #00A88F; color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.3s;" onmouseover="this.style.background='#008B7A'" onmouseout="this.style.background='#00A88F'">
+                            Complete Profile →
+                        </button>
+                    @endif
                 </div>
 
                 <!-- Settings Section -->
@@ -652,7 +705,8 @@
             location: {{ isset($profile) && $profile->location && $profile->postal_code ? 'true' : 'false' }},       // 20%
             resume: {{ isset($profile) && $profile->resume_path ? 'true' : 'false' }},         // Resume file
             cv: {{ isset($profile) && $profile->cv_path ? 'true' : 'false' }},             // CV file
-            portfolio: {{ isset($profile) && $profile->portfolio_path ? 'true' : 'false' }}       // 15%
+            portfolio: {{ isset($profile) && $profile->portfolio_path ? 'true' : 'false' }},       // 15%
+            banner: {{ isset($profile) && $profile->banner_image ? 'true' : 'false' }}        // Banner image
         };
 
         // Update progress circle
@@ -674,6 +728,11 @@
             // Update circle (360 degrees = 100%, so percentage * 3.6 = degrees)
             const degrees = (totalPercentage / 100) * 360;
             progressCircle.style.background = `conic-gradient(#00A88F 0deg ${degrees}deg, #e5e7eb ${degrees}deg 360deg)`;
+            
+            // If 100%, change text color to green
+            if (totalPercentage >= 100) {
+                progressText.style.color = '#00A88F';
+            }
         }
 
         // Update completion item status
@@ -813,32 +872,48 @@
         });
 
         // Cancel file function
-        function cancelFile(cancelBtn) {
+        function cancelFile(cancelBtn, event) {
+            // Prevent any default behavior
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            
             const uploadContainer = cancelBtn.closest('.upload-container');
             const uploadBtn = uploadContainer.querySelector('.upload-btn');
-            const originalText = uploadBtn.getAttribute('data-original');
+            const uploadTitle = uploadContainer.closest('.upload-section').querySelector('.upload-title').textContent;
             
-            uploadBtn.innerHTML = `
-                <img src="{{ asset('image/upload.png') }}" alt="Upload Icon" class="upload-icon">
-                <b>${originalText}</b>
-            `;
+            // Reset button to original state
             uploadBtn.classList.remove('file-selected');
             uploadBtn.style.cursor = 'pointer';
-            uploadBtn.removeAttribute('data-original');
             cancelBtn.style.display = 'none';
-
-            // Update completion based on upload type
-            if (originalText.includes('Resume')) {
+            
+            // Reset button text based on upload type
+            if (uploadTitle.includes('Resume')) {
+                uploadBtn.innerHTML = `
+                    <img src="{{ asset('image/upload.png') }}" alt="Resume Icon" class="upload-icon">
+                    <b>Upload Resume</b>
+                `;
                 completionData.resume = false;
                 checkResumeCV();
-            } else if (originalText.includes('CV')) {
+            } else if (uploadTitle.includes('Curriculum')) {
+                uploadBtn.innerHTML = `
+                    <img src="{{ asset('image/upload.png') }}" alt="CV Icon" class="upload-icon">
+                    <b>Upload CV</b>
+                `;
                 completionData.cv = false;
                 checkResumeCV();
-            } else if (originalText.includes('Portfolio')) {
+            } else if (uploadTitle.includes('Portfolio')) {
+                uploadBtn.innerHTML = `
+                    <img src="{{ asset('image/upload.png') }}" alt="Portfolio Icon" class="upload-icon">
+                    <b>Upload Portfolio</b>
+                `;
                 completionData.portfolio = false;
                 updateCompletionItem('portfolio-item', 'portfolio-icon', false);
                 updateProgressCircle();
             }
+            
+            return false; // Prevent any form submission
         }
 
         // Handle Edit Profile button (photo upload)
@@ -937,7 +1012,15 @@
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                 }
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    // Handle error responses
+                    return response.json().then(data => {
+                        throw new Error(data.message || `HTTP error! status: ${response.status}`);
+                    });
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
                     saveBtn.textContent = 'Saved!';
@@ -979,13 +1062,28 @@
             })
             .catch(error => {
                 console.error('Error:', error);
-                saveBtn.textContent = 'Error - Try Again';
-                saveBtn.style.background = '#ef4444';
-                setTimeout(() => {
-                    saveBtn.textContent = 'Save';
-                    saveBtn.disabled = false;
-                    saveBtn.style.background = '#00A88F';
-                }, 3000);
+                
+                // Check if it's a verification error
+                if (error.message.includes('verification') || error.message.includes('verify')) {
+                    saveBtn.textContent = 'Email Verification Required';
+                    saveBtn.style.background = '#f59e0b';
+                    
+                    // Show verification message
+                    alert('Please verify your email address before updating your profile. Check your email for the verification link.');
+                    
+                    setTimeout(() => {
+                        // Redirect to verification notice
+                        window.location.href = '{{ route("verification.notice") }}';
+                    }, 2000);
+                } else {
+                    saveBtn.textContent = 'Error - Try Again';
+                    saveBtn.style.background = '#ef4444';
+                    setTimeout(() => {
+                        saveBtn.textContent = 'Save';
+                        saveBtn.disabled = false;
+                        saveBtn.style.background = '#00A88F';
+                    }, 3000);
+                }
             });
         });
 

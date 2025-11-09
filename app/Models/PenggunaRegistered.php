@@ -12,6 +12,7 @@ class PenggunaRegistered extends Model
     protected $table = 'pengguna_registered';
 
     protected $fillable = [
+        'user_id',
         'pengguna_id',
         'profile_picture',
         'date_of_birth',
@@ -38,11 +39,31 @@ class PenggunaRegistered extends Model
     }
 
     /**
+     * Get the user that owns the registered profile.
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    /**
+     * Get the owner of this profile (either User or Pengguna).
+     */
+    public function owner()
+    {
+        if ($this->user_id) {
+            return $this->user();
+        }
+        return $this->pengguna();
+    }
+
+    /**
      * Calculate and return the profile completion percentage
      */
     public function calculateCompletionPercentage()
     {
-        $user = $this->pengguna;
+        // Get the owner (either User or Pengguna)
+        $owner = $this->user_id ? $this->user : $this->pengguna;
         $totalPercentage = 0; // Start from 0%
 
         // Upload photo (20%)
@@ -51,7 +72,7 @@ class PenggunaRegistered extends Model
         }
 
         // Personal info (25%) - check both user and profile data
-        if ($user && $user->first_name && $user->last_name && $user->email && $user->phone_number && $this->date_of_birth && $this->gender) {
+        if ($owner && $owner->first_name && $owner->last_name && $owner->email && $owner->phone_number && $this->date_of_birth && $this->gender) {
             $totalPercentage += 25;
         }
 

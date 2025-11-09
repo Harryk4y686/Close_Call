@@ -31,6 +31,7 @@ class ProfileController extends Controller
      */
     public function update(Request $request)
     {
+        // Note: Email verification is handled by middleware
         $request->validate([
             'first_name' => 'nullable|string|max:255',
             'last_name' => 'nullable|string|max:255',

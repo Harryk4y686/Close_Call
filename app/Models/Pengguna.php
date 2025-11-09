@@ -66,6 +66,22 @@ class Pengguna extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Get chats sent by this pengguna.
+     */
+    public function sentChats()
+    {
+        return $this->hasMany(Chat::class, 'sender_id');
+    }
+
+    /**
+     * Get chats received by this pengguna.
+     */
+    public function receivedChats()
+    {
+        return $this->hasMany(Chat::class, 'receiver_id');
+    }
+
+    /**
      * Get the full name attribute.
      */
     public function getNameAttribute()

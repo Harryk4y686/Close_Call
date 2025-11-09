@@ -771,16 +771,16 @@
 <body>
     <!-- Left Sidebar -->
     <div class="sidebar">
-        <div class="sidebar-logo">
+        <a href="{{ route('landing-page') }}" class="sidebar-logo">
             <img src="{{ asset('image/logo.png') }}" alt="CloseCall Logo" class="logo-img">
-        </div>
-        <a href="{{ route('profile') }}" class="sidebar-icon active" data-page="home">
+        </a>
+        <a href="{{ route('profile') }}" class="sidebar-icon" data-page="home">
             <img src="{{ asset('image/home.png') }}" alt="Home" class="sidebar-icon-img">
         </a>
         <a href="{{ route('jobs') }}" class="sidebar-icon" data-page="jobs">
             <img src="{{ asset('image/jobs.png') }}" alt="Jobs" class="sidebar-icon-img">
         </a>
-        <a href="{{ route('events') }}" class="sidebar-icon" data-page="events">
+        <a href="{{ route('events') }}" class="sidebar-icon active" data-page="events">
             <img src="{{ asset('image/events.png') }}" alt="Events" class="sidebar-icon-img">
         </a>
         <a href="{{ route('chats') }}" class="sidebar-icon" data-page="chats">
@@ -807,9 +807,18 @@
                 </svg>
             </a>
             <a href="{{ route('profile') }}" class="avatar-icon">
-                <svg width="18" height="18" fill="#6b7280" viewBox="0 0 24 24">
-                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                </svg>
+                @if(isset($profile) && $profile->profile_picture)
+                    <img src="{{ asset('storage/' . $profile->profile_picture) }}" alt="Profile" 
+                         style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"
+                         onerror="console.error('Failed to load profile image:', this.src); this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <svg width="18" height="18" fill="#6b7280" viewBox="0 0 24 24" style="display: none;">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
+                @else
+                    <svg width="18" height="18" fill="#6b7280" viewBox="0 0 24 24">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
+                @endif
             </a>
         </div>
 
@@ -819,46 +828,28 @@
             <div class="event-card fade-in-up">
                 <!-- Large Background Image -->
                 <div class="event-image">
-                    {{-- DEBUG INFO --}}
-                    @if(config('app.debug'))
-                        <div style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); color: white; padding: 10px; border-radius: 5px; z-index: 1000; font-size: 12px;">
-                            <strong>Debug Info:</strong><br>
-                            Banner Image: {{ $event->banner_image ?? 'NULL' }}<br>
-                            File Exists: {{ $event->banner_image && file_exists(public_path($event->banner_image)) ? 'YES' : 'NO' }}<br>
-                            Full Path: {{ $event->banner_image ? public_path($event->banner_image) : 'N/A' }}<br>
-                            URL: {{ $event->banner_image ? asset($event->banner_image) : 'N/A' }}
-                        </div>
-                    @endif
-                    
-                    @if($event->banner_image && file_exists(public_path($event->banner_image)))
-                        <img src="{{ asset($event->banner_image) }}" alt="{{ $event->title }}" class="background-image">
-                    @elseif($event->banner_image)
-                        {{-- Image path exists in DB but file not found --}}
-                        <img src="{{ asset('image/JCI.png') }}" alt="Event Background" class="background-image">
-                    @else
-                        {{-- No image uploaded --}}
-                        <img src="{{ asset('image/JCI.png') }}" alt="Event Background" class="background-image">
-                    @endif
+                    <img src="{{ $event->banner_url }}" alt="{{ $event->title }}" class="background-image"
+                         onerror="this.src='{{ asset('image/JCI.png') }}';">
                 </div>
                 
                 <!-- Event Details -->
                 <div class="event-details">
                     <h2 class="event-title">{{ $event->title }}</h2>
                     <div class="event-info">
-                        <p class="event-by">Event by {{ $event->creator->name ?? 'Unknown' }}</p>
+                        <p class="event-by">Event by {{ $event->creator ? $event->creator->full_name : 'Unknown' }}</p>
                         <p class="event-date">{{ $event->formatted_date_time }}</p>
                         <p class="event-location">{{ $event->location }}{{ $event->country ? ', ' . $event->country : '' }} | {{ $event->attendees_count }} Attendees</p>
                     </div>
                     <div class="event-buttons">
                         @if($isAttending)
-                            <form action="{{ route('events.cancel', $event->id) }}" method="POST" style="flex: 1;">
+                            <form action="{{ route('events.cancel', $event->id) }}" method="POST" style="flex: 1;" onsubmit="return confirmCancelAttendance()">
                                 @csrf
                                 <button type="submit" class="attend-btn" style="width: 100%; background: #dc2626;">Cancel Attendance</button>
                             </form>
                         @else
-                            <form action="{{ route('events.attend', $event->id) }}" method="POST" style="flex: 1;">
+                            <form action="{{ route('events.attend', $event->id) }}" method="POST" style="flex: 1;" id="attendForm" onsubmit="return handleAttendSubmit(event)">
                                 @csrf
-                                <button type="submit" class="attend-btn" style="width: 100%;">Attend</button>
+                                <button type="submit" class="attend-btn" style="width: 100%;" id="attendButton">Attend</button>
                             </form>
                         @endif
                         <button class="share-btn" onclick="shareCurrentEvent('{{ addslashes($event->title) }}')"><span>Share</span></button>
@@ -878,13 +869,124 @@
     </div>
 
     <script>
+        // Track attendance state
+        let isCurrentlyAttending = {{ $isAttending ? 'true' : 'false' }};
+        
+        // Handle attend button submission
+        function handleAttendSubmit(event) {
+            if (isCurrentlyAttending) {
+                event.preventDefault(); // Prevent form submission
+                showNotification('You have already attended this event!', 'info');
+                return false;
+            }
+            
+            // Disable button to prevent double submission
+            const submitButton = event.target.querySelector('button[type="submit"]');
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.textContent = 'Processing...';
+                
+                // Re-enable after 3 seconds as fallback
+                setTimeout(() => {
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'Attend';
+                }, 3000);
+            }
+            
+            // If not attending, allow form submission
+            return true;
+        }
+        
+        // Handle cancel attendance confirmation
+        function confirmCancelAttendance() {
+            if (confirm('Are you sure you want to cancel your attendance?')) {
+                isCurrentlyAttending = false;
+                return true;
+            }
+            return false;
+        }
+        
+        // Update attendance button based on state
+        function updateAttendanceButton(isAttending) {
+            const eventButtons = document.querySelector('.event-buttons');
+            if (isAttending) {
+                // Update to show Cancel Attendance button
+                eventButtons.innerHTML = `
+                    <form action="{{ route('events.cancel', $event->id) }}" method="POST" style="flex: 1;" onsubmit="return confirmCancelAttendance()">
+                        @csrf
+                        <button type="submit" class="attend-btn" style="width: 100%; background: #dc2626;">Cancel Attendance</button>
+                    </form>
+                    <button class="share-btn" onclick="shareCurrentEvent('{{ addslashes($event->title) }}')"><span>Share</span></button>
+                `;
+            } else {
+                // Update to show Attend button
+                eventButtons.innerHTML = `
+                    <form action="{{ route('events.attend', $event->id) }}" method="POST" style="flex: 1;" id="attendForm" onsubmit="return handleAttendSubmit(event)">
+                        @csrf
+                        <button type="submit" class="attend-btn" style="width: 100%;" id="attendButton">Attend</button>
+                    </form>
+                    <button class="share-btn" onclick="shareCurrentEvent('{{ addslashes($event->title) }}')"><span>Share</span></button>
+                `;
+            }
+        }
+        
+        // Show notification popup
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 30px;
+                right: 30px;
+                background: ${type === 'info' ? '#3b82f6' : type === 'success' ? '#10b981' : '#ef4444'};
+                color: white;
+                padding: 20px 30px;
+                border-radius: 12px;
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+                z-index: 10000;
+                font-size: 16px;
+                font-weight: 600;
+                max-width: 400px;
+                min-width: 300px;
+                animation: slideIn 0.4s ease-out;
+                border-left: 4px solid rgba(255, 255, 255, 0.3);
+            `;
+            
+            // Add animation styles
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+                @keyframes slideOut {
+                    from { transform: translateX(0); opacity: 1; }
+                    to { transform: translateX(100%); opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            // Auto remove after 3 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-in';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+        
         // Share current event function - Just copy link to clipboard
         function shareCurrentEvent(eventName) {
             const eventUrl = window.location.href;
             
             // Copy link to clipboard
             navigator.clipboard.writeText(eventUrl).then(() => {
-                alert('Link copied to clipboard!');
+                showNotification('Link copied to clipboard!', 'success');
             }).catch((error) => {
                 console.log('Error copying to clipboard:', error);
                 // Alternative fallback
@@ -892,17 +994,24 @@
             });
         }
 
-        // Show success message if present
+        // Show session messages with custom notifications
         @if(session('success'))
-            alert('{{ session('success') }}');
+            showNotification('{{ session('success') }}', 'success');
+            // If success message contains "attended", update the attendance state
+            const successMessage = '{{ session('success') }}';
+            if (successMessage.toLowerCase().includes('attended')) {
+                isCurrentlyAttending = true;
+                // Update the button to show "Cancel Attendance"
+                updateAttendanceButton(true);
+            }
         @endif
 
         @if(session('info'))
-            alert('{{ session('info') }}');
+            showNotification('{{ session('info') }}', 'info');
         @endif
 
         @if(session('error'))
-            alert('{{ session('error') }}');
+            showNotification('{{ session('error') }}', 'error');
         @endif
     </script>
 </body>

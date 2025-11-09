@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Facades\Storage;
 use App\Models\User;
 use App\Models\Pengguna;
 
@@ -46,9 +47,7 @@ class Event extends Model
      */
     public function creator(): BelongsTo
     {
-        // Try to use Pengguna first, fallback to User
-        $userModel = class_exists('App\Models\Pengguna') ? Pengguna::class : User::class;
-        return $this->belongsTo($userModel, 'user_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     /**
@@ -74,12 +73,20 @@ class Event extends Model
     /**
      * Get the full URL for the banner image.
      */
-    public function getBannerUrlAttribute(): ?string
+    public function getBannerUrlAttribute(): string
     {
-        if ($this->banner_image) {
+        if ($this->banner_image && \Storage::disk('public')->exists($this->banner_image)) {
             return asset('storage/' . $this->banner_image);
         }
-        return null;
+        return asset('image/JCI.png'); // Default banner
+    }
+
+    /**
+     * Check if event has a custom banner.
+     */
+    public function hasCustomBanner(): bool
+    {
+        return !empty($this->banner_image);
     }
 
     /**

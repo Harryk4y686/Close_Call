@@ -22,7 +22,24 @@ class EmailVerification extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(Pengguna::class, 'user_id');
+        // Try to find in Pengguna first, then fallback to User
+        $pengguna = \App\Models\Pengguna::find($this->user_id);
+        if ($pengguna) {
+            return $this->belongsTo(Pengguna::class, 'user_id');
+        }
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    /**
+     * Get the user (works with both User and Pengguna)
+     */
+    public function getUser()
+    {
+        $pengguna = \App\Models\Pengguna::find($this->user_id);
+        if ($pengguna) {
+            return $pengguna;
+        }
+        return \App\Models\User::find($this->user_id);
     }
 
     public function isExpired(): bool

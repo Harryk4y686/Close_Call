@@ -144,6 +144,30 @@
                 </div>
             @endif
 
+            <!-- Display Warning Message -->
+            @if (session('warning'))
+                <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-4">
+                    <div class="flex items-center mb-2">
+                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                        </svg>
+                        {{ session('warning') }}
+                    </div>
+                    @if (session('show_resend_link'))
+                        <div class="text-sm">
+                            <p class="mb-2">Didn't receive the email?</p>
+                            <form action="{{ route('verification.resend') }}" method="POST" class="inline">
+                                @csrf
+                                <input type="hidden" name="email" value="{{ session('user_email') }}">
+                                <button type="submit" class="text-yellow-800 underline hover:text-yellow-900 font-medium">
+                                    Resend verification email
+                                </button>
+                            </form>
+                        </div>
+                    @endif
+                </div>
+            @endif
+
             <form action="{{ route('login.post') }}" method="POST" class="space-y-4">
                 @csrf
                 <input type="email" name="email" placeholder="Email" class="input-field" value="{{ old('email') }}" required>
@@ -162,6 +186,13 @@
                 Don’t have an account?
                 <a href="{{ route('register') }}" class="text-cyan-700 font-medium">Sign up</a>
             </p>
+            
+            <!-- Admin Login Info -->
+            <div style="margin-top: 16px; padding: 12px; background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: 8px; border: 1px solid #00A88F;">
+                <p style="text-align: center; margin: 0; font-size: 13px; color: #00A88F; font-weight: 600;">
+                    🔐 Admin Access: Use admin credentials to access the dashboard
+                </p>
+            </div>
 
             <div class="flex items-center my-6">
                 <hr class="flex-grow border-gray-300">

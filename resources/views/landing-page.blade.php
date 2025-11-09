@@ -937,9 +937,17 @@
                 <a href="#" class="nav-link">Browse Jobs</a>
                 <a href="#" class="nav-link">Reviews</a>
                 <a href="#" class="nav-link">CloseCall AI</a>
-                <a href="#" class="nav-link profile-link">
-                    <img src="{{ asset('image/profileicon.png') }}" alt="Profile" class="profile-icon">
-                    ini adalah profil
+                <a href="{{ route('profile') }}" class="nav-link profile-link">
+                    @if(isset($profile) && $profile->profile_picture)
+                        <img src="{{ asset('storage/' . $profile->profile_picture) }}" alt="Profile" class="profile-icon" style="object-fit: cover;">
+                    @else
+                        <img src="{{ asset('image/profileicon.png') }}" alt="Profile" class="profile-icon">
+                    @endif
+                    @if(isset($user) && $user->first_name)
+                        {{ $user->first_name }}@if($user->last_name) {{ $user->last_name }}@endif
+                    @else
+                        Profile
+                    @endif
                 </a>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf

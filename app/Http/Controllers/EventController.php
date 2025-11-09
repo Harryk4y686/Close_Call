@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 
 class EventController extends Controller
 {
@@ -44,7 +43,10 @@ class EventController extends Controller
             ->upcoming()
             ->get();
         
-        return view('events', compact('myEvents', 'recommendedEvents', 'upcomingEvents'));
+        // Get user profile for header display
+        $profile = $user->registeredProfile;
+        
+        return view('events', compact('myEvents', 'recommendedEvents', 'upcomingEvents', 'user', 'profile'));
     }
 
     /**
@@ -64,7 +66,9 @@ class EventController extends Controller
      */
     public function create()
     {
-        return view('createevent');
+        $user = Auth::user();
+        $profile = $user->registeredProfile;
+        return view('createevent', compact('user', 'profile'));
     }
 
     /**
@@ -73,8 +77,6 @@ class EventController extends Controller
     public function store(Request $request)
     {
         try {
-            // Debug: Log the request data
-            Log::info('Event creation attempt', $request->all());
             
             $validated = $request->validate([
                 'event_title' => 'required|string|max:255',
@@ -88,38 +90,23 @@ class EventController extends Controller
 
             $bannerPath = null;
             
-            // Handle file upload - Save directly to public folder
+            // Handle file upload - Use Laravel's storage system like profile pictures
             if ($request->hasFile('event_banner') && $request->file('event_banner')->isValid()) {
                 $file = $request->file('event_banner');
-                Log::info('File upload detected', [
-                    'filename' => $file->getClientOriginalName(),
-                    'size' => $file->getSize(),
-                    'mime' => $file->getMimeType()
-                ]);
                 
-                // Save directly to public/uploads/event-banners
-                $directory = public_path('uploads/event-banners');
-                if (!file_exists($directory)) {
-                    mkdir($directory, 0755, true);
-                    Log::info('Created directory: ' . $directory);
-                }
-                
-                // Generate unique filename
+                // Generate a unique filename
                 $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
                 
-                // Move file to public directory
-                $file->move($directory, $filename);
+                // Store in storage/app/public/event-banners (same pattern as profile pictures)
+                $bannerPath = $file->storeAs('event-banners', $filename, 'public');
                 
-                // Store relative path for database
-                $bannerPath = 'uploads/event-banners/' . $filename;
-                
-                Log::info('File stored successfully', [
+                // Log for debugging
+                Log::info('Banner uploaded:', [
                     'path' => $bannerPath,
-                    'full_path' => public_path($bannerPath),
-                    'exists' => file_exists(public_path($bannerPath))
+                    'full_path' => storage_path('app/public/' . $bannerPath),
+                    'exists' => file_exists(storage_path('app/public/' . $bannerPath)),
+                    'url' => asset('storage/' . $bannerPath)
                 ]);
-            } else {
-                Log::info('No valid file uploaded');
             }
 
             // Check if user is authenticated
@@ -141,13 +128,7 @@ class EventController extends Controller
                         'password' => bcrypt('password')
                     ]);
                 }
-                Log::warning('User ID mismatch, using alternative user', [
-                    'auth_user_id' => $user->id,
-                    'db_user_id' => $dbUser->id
-                ]);
             }
-
-            Log::info('Creating event for user', ['user_id' => $dbUser->id, 'user_name' => $dbUser->name]);
 
             $event = Event::create([
                 'user_id' => $dbUser->id,
@@ -161,10 +142,8 @@ class EventController extends Controller
                 'status' => 'published',
             ]);
 
-            Log::info('Event created successfully', ['event_id' => $event->id]);
-
             return redirect()->route('events')
-                ->with('success', 'Event created successfully!');
+                ->with('success', 'Event created successfully!' . ($bannerPath ? ' Banner uploaded successfully!' : ''));
                 
         } catch (\Exception $e) {
             Log::error('Event creation failed', [
@@ -194,7 +173,10 @@ class EventController extends Controller
         
         $isAttending = $dbUser ? $event->attendees()->where('user_id', $dbUser->id)->exists() : false;
         
-        return view('viewevent', compact('event', 'isAttending'));
+        // Get user profile for header display
+        $profile = $user->registeredProfile;
+        
+        return view('viewevent', compact('event', 'isAttending', 'user', 'profile'));
     }
 
     /**
@@ -203,7 +185,9 @@ class EventController extends Controller
     public function edit($id)
     {
         $event = Event::where('user_id', Auth::id())->findOrFail($id);
-        return view('createevent', compact('event'));
+        $user = Auth::user();
+        $profile = $user->registeredProfile;
+        return view('createevent', compact('event', 'user', 'profile'));
     }
 
     /**
@@ -224,14 +208,20 @@ class EventController extends Controller
         ]);
 
         // Handle file upload
-        if ($request->hasFile('event_banner')) {
+        if ($request->hasFile('event_banner') && $request->file('event_banner')->isValid()) {
             // Delete old banner if exists
             if ($event->banner_image) {
                 Storage::disk('public')->delete($event->banner_image);
             }
             
-            $bannerPath = $request->file('event_banner')->store('event-banners', 'public');
-            $event->banner_image = $bannerPath;
+            $file = $request->file('event_banner');
+            
+            // Generate a unique filename
+            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            
+            // Store in storage/app/public/event-banners
+            $bannerPath = $file->storeAs('event-banners', $filename, 'public');
+            $validated['banner_image'] = $bannerPath;
         }
 
         $event->update([
@@ -241,6 +231,7 @@ class EventController extends Controller
             'event_time' => $validated['event_time'],
             'location' => $validated['event_location'],
             'country' => $validated['event_country'],
+            'banner_image' => $validated['banner_image'] ?? $event->banner_image,
         ]);
 
         return redirect()->route('events.view', $event->id)
@@ -264,8 +255,8 @@ class EventController extends Controller
         $event = Event::where('user_id', $dbUser->id)->where('id', $id)->firstOrFail();
         
         // Delete banner image if exists
-        if ($event->banner_image && file_exists(public_path($event->banner_image))) {
-            unlink(public_path($event->banner_image));
+        if ($event->banner_image) {
+            Storage::disk('public')->delete($event->banner_image);
         }
         
         // Delete all attendees
@@ -296,16 +287,25 @@ class EventController extends Controller
 
         // Check if already attending
         if ($event->attendees()->where('user_id', $dbUser->id)->exists()) {
-            return back()->with('info', 'You are already attending this event.');
+            return back()->with('info', 'You have already attended this event.');
         }
 
-        // Add user to attendees
-        $event->attendees()->attach($dbUser->id, ['status' => 'attending']);
-        
-        // Increment attendees count
-        $event->increment('attendees_count');
+        // Add user to attendees (use sync to avoid duplicates)
+        try {
+            $event->attendees()->attach($dbUser->id, ['status' => 'attending']);
+            
+            // Increment attendees count
+            $event->increment('attendees_count');
 
-        return back()->with('success', 'Attend successfully');
+            return back()->with('success', 'Successfully attended the event!');
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Handle duplicate entry gracefully
+            if ($e->getCode() == 23000) { // Integrity constraint violation
+                return back()->with('info', 'You have already attended this event.');
+            }
+            // Re-throw other exceptions
+            throw $e;
+        }
     }
 
     /**

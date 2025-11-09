@@ -10,6 +10,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TestRelationController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\RelationshipTestController;
+use App\Http\Controllers\AdminController;
 use App\Mail\VerifyEmailUser;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
@@ -23,13 +25,17 @@ Route::get('/', function () {
 
 // halaman home/landing page dengan akun (protected route - requires authentication and verification)
 Route::get('/landingpage2', function () {
-    return view('landing-page');
+    $user = Auth::user();
+    $profile = $user->registeredProfile;
+    return view('landing-page', compact('user', 'profile'));
 })->middleware(['auth'])->name('landing-page');
 
-// Profile routes (protected - requires authentication)
+// Profile routes (protected - requires authentication and verification for updates)
 Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
-    Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/update', [ProfileController::class, 'update'])
+        ->middleware(\App\Http\Middleware\EnsureEmailIsVerified::class)
+        ->name('profile.update');
     Route::get('/profile/completion', [ProfileController::class, 'getCompletionPercentage'])->name('profile.completion');
 });
 
@@ -38,12 +44,12 @@ Route::get('/complete-profile', function () {
     return redirect()->route('profile');
 })->name('complete.profile');
  
-// Jobs page (protected - requires authentication)
+// Jobs page (protected - requires authentication and verification)
 Route::get('/jobs', function () {
     $user = Auth::user();
     $profile = $user->registeredProfile;
     return view('jobs', compact('user', 'profile'));
-})->middleware(['auth'])->name('jobs');
+})->middleware(['auth', \App\Http\Middleware\EnsureEmailIsVerified::class])->name('jobs');
  
 // Events routes (protected - requires authentication)
 Route::middleware(['auth'])->group(function () {
@@ -177,5 +183,25 @@ Route::get('/test-relations', [TestRelationController::class, 'testRelations'])-
 Route::get('/show-users-profiles', [TestRelationController::class, 'showAllUsersWithProfiles'])->name('test.users.profiles');
 Route::get('/test-progress', [TestRelationController::class, 'testProgressSaving'])->name('test.progress');
 
-// Include debug routes
-require __DIR__.'/debug.php';
+// New Relationship Test Routes
+Route::get('/test-relationships', [RelationshipTestController::class, 'testRelationships'])->name('test.relationships');
+Route::get('/test-chat-relationships', [RelationshipTestController::class, 'testChatRelationships'])->name('test.chat.relationships');
+
+// Admin Routes (protected - requires admin access)
+Route::middleware(['auth', 'is_admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
+    Route::get('/users', [AdminController::class, 'users'])->name('users');
+    Route::get('/jobs', [AdminController::class, 'jobs'])->name('jobs');
+    Route::get('/events', [AdminController::class, 'events'])->name('events');
+    Route::get('/companies', [AdminController::class, 'companies'])->name('companies');
+    
+    // Delete routes
+    Route::delete('/users/{id}', [AdminController::class, 'deleteUser'])->name('users.delete');
+    Route::delete('/events/{id}', [AdminController::class, 'deleteEvent'])->name('events.delete');
+});
+
+// Debug routes
+if (config('app.debug')) {
+    require __DIR__.'/debug-events.php';
+    require __DIR__.'/test-auth.php';
+}

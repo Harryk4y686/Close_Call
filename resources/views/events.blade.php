@@ -17,9 +17,8 @@
         
         /* Header styles from jobs.blade.php */
         .header {
-            background: white;
+            background: transparent;
             padding: 1rem 2rem;
-            border-bottom: 1px solid #e5e7eb;
             display: flex;
             justify-content: flex-end;
             align-items: center;
@@ -30,13 +29,6 @@
             gap: 1rem;
             margin-left: 0px;
             padding-left: 129px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
-        
-        .header:hover {
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
         }
         .search-bar {
             display: flex;
@@ -489,16 +481,16 @@
 <body>
     <!-- Left Sidebar -->
     <div class="sidebar">
-        <div class="sidebar-logo">
+        <a href="{{ route('landing-page') }}" class="sidebar-logo">
             <img src="{{ asset('image/logo.png') }}" alt="CloseCall Logo" class="logo-img">
-        </div>
-        <a href="{{ route('profile') }}" class="sidebar-icon active" data-page="home">
+        </a>
+        <a href="{{ route('profile') }}" class="sidebar-icon" data-page="home">
             <img src="{{ asset('image/home.png') }}" alt="Home" class="sidebar-icon-img">
         </a>
         <a href="{{ route('jobs') }}" class="sidebar-icon" data-page="jobs">
             <img src="{{ asset('image/jobs.png') }}" alt="Jobs" class="sidebar-icon-img">
         </a>
-        <a href="{{ route('events') }}" class="sidebar-icon" data-page="events">
+        <a href="{{ route('events') }}" class="sidebar-icon active" data-page="events">
             <img src="{{ asset('image/events.png') }}" alt="Events" class="sidebar-icon-img">
         </a>
         <a href="{{ route('chats') }}" class="sidebar-icon" data-page="chats">
@@ -525,9 +517,18 @@
                 </svg>
             </a>
             <a href="{{ route('profile') }}" class="avatar-icon">
-                <svg width="18" height="18" fill="#6b7280" viewBox="0 0 24 24">
-                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                </svg>
+                @if(isset($profile) && $profile->profile_picture)
+                    <img src="{{ asset('storage/' . $profile->profile_picture) }}" alt="Profile" 
+                         style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"
+                         onerror="console.error('Failed to load profile image:', this.src); this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <svg width="18" height="18" fill="#6b7280" viewBox="0 0 24 24" style="display: none;">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
+                @else
+                    <svg width="18" height="18" fill="#6b7280" viewBox="0 0 24 24">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
+                @endif
             </a>
         </div>
 

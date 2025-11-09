@@ -14,11 +14,10 @@
             overflow-x: hidden;
         }
         
-        /* Header styles */
+        /* Header styles - removed white background */
         .header {
-            background: white;
+            background: transparent;
             padding: 1rem 2rem;
-            border-bottom: 1px solid #e5e7eb;
             display: flex;
             justify-content: flex-end;
             align-items: center;
@@ -29,13 +28,6 @@
             gap: 1rem;
             margin-left: 0px;
             padding-left: 129px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
-        
-        .header:hover {
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
         }
         
         .search-bar {
@@ -385,9 +377,9 @@
 <body>
     <!-- Left Sidebar -->
     <div class="sidebar">
-        <div class="sidebar-logo">
+        <a href="{{ route('landing-page') }}" class="sidebar-logo">
             <img src="{{ asset('image/logo.png') }}" alt="CloseCall Logo" class="logo-img">
-        </div>
+        </a>
         <a href="{{ route('profile') }}" class="sidebar-icon" data-page="home">
             <img src="{{ asset('image/home.png') }}" alt="Home" class="sidebar-icon-img">
         </a>
@@ -409,21 +401,25 @@
     <div class="main-content">
         <!-- Header -->
         <div class="header">
-            <div class="search-bar">
-                <svg width="18" height="18" fill="#6b7280" viewBox="0 0 24 24">
-                    <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-                </svg>
-                <input type="text" placeholder="Search...">
-            </div>
+            <div style="flex: 1;"></div> <!-- Spacer to push icons to the right -->
             <a href="#" class="notification-icon">
                 <svg width="18" height="18" fill="#6b7280" viewBox="0 0 24 24">
                     <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
                 </svg>
             </a>
             <a href="{{ route('profile') }}" class="avatar-icon">
-                <svg width="18" height="18" fill="#6b7280" viewBox="0 0 24 24">
-                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                </svg>
+                @if(isset($profile) && $profile->profile_picture)
+                    <img src="{{ asset('storage/' . $profile->profile_picture) }}" alt="Profile" 
+                         style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"
+                         onerror="console.error('Failed to load profile image:', this.src); this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <svg width="18" height="18" fill="#6b7280" viewBox="0 0 24 24" style="display: none;">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
+                @else
+                    <svg width="18" height="18" fill="#6b7280" viewBox="0 0 24 24">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
+                @endif
             </a>
         </div>
 
@@ -524,53 +520,89 @@
     </div>
 
     <script>
-        // File upload preview
-        document.getElementById('event_banner').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const uploadArea = document.querySelector('.file-upload');
-                uploadArea.innerHTML = `
-                    <div style="color: #00A49C; font-weight: 600; margin-bottom: 8px;">
-                        ✓ File selected: ${file.name}
-                    </div>
-                    <div style="color: #6b7280; font-size: 14px;">
-                        Click to change file
-                    </div>
-                    <input type="file" id="event_banner" name="event_banner" accept="image/*" style="display: none;">
-                `;
-                
-                // Re-attach click event
-                uploadArea.onclick = function() {
-                    document.getElementById('event_banner').click();
-                };
-            }
-        });
-
-        // Set minimum date to today
-        document.getElementById('event_date').min = new Date().toISOString().split('T')[0];
-        
-        // Debug form submission
-        document.querySelector('form').addEventListener('submit', function(e) {
-            console.log('Form is being submitted...');
-            console.log('Form action:', this.action);
-            console.log('Form method:', this.method);
+        // File upload with preview - FIXED to keep original input with file
+        document.addEventListener('DOMContentLoaded', function() {
+            const uploadArea = document.querySelector('.file-upload');
+            const fileInput = document.getElementById('event_banner');
+            let previewContainer = null;
             
-            // Check if all required fields are filled
-            const requiredFields = this.querySelectorAll('[required]');
-            let allFilled = true;
-            requiredFields.forEach(field => {
-                if (!field.value.trim()) {
-                    console.log('Missing required field:', field.name);
-                    allFilled = false;
+            // Click to select file
+            uploadArea.addEventListener('click', function(e) {
+                // Don't trigger if clicking the file input itself
+                if (e.target !== fileInput) {
+                    fileInput.click();
                 }
             });
             
-            if (!allFilled) {
-                console.log('Form submission prevented - missing required fields');
-                return false;
-            }
-            
-            console.log('Form should submit now...');
+            // Handle file selection
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                
+                if (file) {
+                    // Validate file type
+                    if (!file.type.startsWith('image/')) {
+                        alert('Please select an image file');
+                        return;
+                    }
+                    
+                    // Validate file size (10MB max)
+                    if (file.size > 10 * 1024 * 1024) {
+                        alert('File size must be less than 10MB');
+                        return;
+                    }
+                    
+                    // Read and show preview
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(event) {
+                        // Remove old preview if exists
+                        if (previewContainer) {
+                            previewContainer.remove();
+                        }
+                        
+                        // Create preview container
+                        previewContainer = document.createElement('div');
+                        previewContainer.style.cssText = 'text-align: center;';
+                        
+                        // Create preview image
+                        const img = document.createElement('img');
+                        img.src = event.target.result;
+                        img.alt = 'Preview';
+                        img.style.cssText = 'max-width: 200px; max-height: 120px; object-fit: cover; border-radius: 8px; border: 2px solid #00A49C; display: block; margin: 0 auto 12px auto;';
+                        
+                        // Create success message
+                        const successMsg = document.createElement('div');
+                        successMsg.style.cssText = 'color: #00A49C; font-weight: 600; margin-bottom: 8px;';
+                        successMsg.textContent = '✓ File selected: ' + file.name;
+                        
+                        // Create change message
+                        const changeMsg = document.createElement('div');
+                        changeMsg.style.cssText = 'color: #6b7280; font-size: 14px;';
+                        changeMsg.textContent = 'Click to change file';
+                        
+                        // Append elements to preview container
+                        previewContainer.appendChild(img);
+                        previewContainer.appendChild(successMsg);
+                        previewContainer.appendChild(changeMsg);
+                        
+                        // Insert preview before the file input (don't remove input!)
+                        uploadArea.insertBefore(previewContainer, fileInput);
+                        
+                        // Hide the upload text
+                        const uploadIcon = uploadArea.querySelector('.upload-icon');
+                        const uploadText = uploadArea.querySelector('.upload-text');
+                        if (uploadIcon) uploadIcon.style.display = 'none';
+                        if (uploadText) uploadText.style.display = 'none';
+                    };
+                    
+                    reader.readAsDataURL(file);
+                }
+            });
+        });
+
+        // Set minimum date to today
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('event_date').min = new Date().toISOString().split('T')[0];
         });
     </script>
 </body>
