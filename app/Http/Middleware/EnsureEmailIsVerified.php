@@ -16,7 +16,11 @@ class EnsureEmailIsVerified
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check() && !Auth::user()->verified) {
+        // Check both web and pengguna guards
+        $user = Auth::guard('web')->check() ? Auth::guard('web')->user() : 
+                (Auth::guard('pengguna')->check() ? Auth::guard('pengguna')->user() : null);
+        
+        if ($user && isset($user->verified) && !$user->verified) {
             // For AJAX requests, return JSON response
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([
@@ -27,7 +31,8 @@ class EnsureEmailIsVerified
             }
             
             // For regular requests, redirect
-            Auth::logout();
+            Auth::guard('web')->logout();
+            Auth::guard('pengguna')->logout();
             return redirect()->route('verification.notice')
                 ->with('error', 'Please verify your email address before accessing this area.');
         }

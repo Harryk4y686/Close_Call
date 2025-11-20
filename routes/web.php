@@ -18,14 +18,18 @@ use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Auth;
 
+// Debug route to check users
+require __DIR__.'/debug-users.php';
+
 // halaman home/landing page tanpa akun
 Route::get('/', function () {
-    return view('landingpage');
+    return view('LandingPage');
 })->name('landingpage');
 
 // halaman home/landing page dengan akun (protected route - requires authentication and verification)
 Route::get('/landingpage2', function () {
-    $user = Auth::user();
+    // Get user from either guard
+    $user = Auth::guard('pengguna')->check() ? Auth::guard('pengguna')->user() : Auth::guard('web')->user();
     $profile = $user->registeredProfile;
     return view('landing-page', compact('user', 'profile'));
 })->middleware(['auth'])->name('landing-page');
@@ -46,10 +50,21 @@ Route::get('/complete-profile', function () {
  
 // Jobs page (protected - requires authentication and verification)
 Route::get('/jobs', function () {
-    $user = Auth::user();
+    // Get user from either guard
+    $user = Auth::guard('pengguna')->check() ? Auth::guard('pengguna')->user() : Auth::guard('web')->user();
     $profile = $user->registeredProfile;
     return view('jobs', compact('user', 'profile'));
 })->middleware(['auth', \App\Http\Middleware\EnsureEmailIsVerified::class])->name('jobs');
+
+// Jobs Categories page (protected - requires authentication and verification)
+Route::get('/jobs/categories', function () {
+    return view('JobsCategories');
+})->middleware(['auth', \App\Http\Middleware\EnsureEmailIsVerified::class])->name('jobs.categories');
+
+// Jobs Opened page (protected - requires authentication and verification)
+Route::get('/jobs/opened', function () {
+    return view('JobsOpened');
+})->middleware(['auth', \App\Http\Middleware\EnsureEmailIsVerified::class])->name('jobs.opened');
  
 // Events routes (protected - requires authentication)
 Route::middleware(['auth'])->group(function () {
@@ -90,6 +105,11 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/chats', [ChatController::class, 'store'])->name('chats.store');
     Route::get('/api/chats/{user}/messages', [ChatController::class, 'getMessages'])->name('chats.messages');
     Route::get('/api/users', [ChatController::class, 'getUsersList'])->name('users.list');
+    
+    // New conversation and search endpoints
+    Route::post('/api/chats/conversations', [ChatController::class, 'createConversation'])->name('chats.conversations.create');
+    Route::get('/api/chats/conversations', [ChatController::class, 'getConversations'])->name('chats.conversations');
+    Route::get('/api/chats/search', [ChatController::class, 'search'])->name('chats.search');
 });
 
 // (testing) halaman AI
@@ -111,6 +131,46 @@ Route::get('/bestpartner', function () {
 Route::get('/aboutbestpartner', function () {
     return view('aboutbestpartner');
 })->name('aboutbestpartner');
+
+// (testing) halaman admin user add
+Route::get('/adminuseradd', function () {
+    return view('admin.AdminUser');
+})->name('adminuseradd');
+
+// (testing) halaman admin user edit
+Route::get('/adminuseredit', function () {
+    return view('admin.AdminUserEdit');
+})->name('adminuseredit');
+
+// (testing) halaman admin job add
+Route::get('/adminjobadd', function () {
+    return view('admin.AdminJob');
+})->name('adminjobadd');
+
+// (testing) halaman admin job edit
+Route::get('/adminjobedit', function () {
+    return view('admin.AdminJobEdit');
+})->name('adminjobedit');
+
+// (testing) halaman admin company add
+Route::get('/admincompanyadd', function () {
+    return view('admin.AdminCompany');
+})->name('admincompanyadd');
+
+// (testing) halaman admin company edit
+Route::get('/admincompanyedit', function () {
+    return view('admin.AdminCompanyEdit');
+})->name('admincompanyedit');
+
+// (testing) halaman admin event add
+Route::get('/admineventadd', function () {
+    return view('admin.AdminEvent');
+})->name('admineventadd');
+
+// (testing) halaman admin event edit
+Route::get('/admineventedit', function () {
+    return view('admin.AdminEventEdit');
+})->name('admineventedit');
 
 // halaman register
 Route::get('/register', [UserRegistrationController::class, 'showRegistrationForm'])->name('register');

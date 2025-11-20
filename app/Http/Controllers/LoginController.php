@@ -31,16 +31,55 @@ class LoginController extends Controller
             'password_length' => strlen($credentials['password'])
         ]);
         
-        // Check if user exists
+        // Check if user exists in User table first
         $user = \App\Models\User::where('email', $credentials['email'])->first();
         
+        // If not in User table, check Pengguna table
         if (!$user) {
-            Log::warning('User not found: ' . $credentials['email']);
+            $pengguna = \App\Models\Pengguna::where('email', $credentials['email'])->first();
+            
+            if (!$pengguna) {
+                Log::warning('User not found in either table: ' . $credentials['email']);
+                return back()->withErrors([
+                    'email' => 'Email tidak ditemukan di sistem!',
+                ])->withInput();
+            }
+            
+            // Try to authenticate with Pengguna guard
+            Log::info('Attempting Pengguna login', [
+                'id' => $pengguna->id,
+                'email' => $pengguna->email
+            ]);
+            
+            if (Auth::guard('pengguna')->attempt($credentials)) {
+                $authenticatedUser = Auth::guard('pengguna')->user();
+                
+                // Set the default guard to pengguna for this session
+                Auth::shouldUse('pengguna');
+                
+                Log::info('Pengguna login successful', ['user_id' => $authenticatedUser->id]);
+                
+                // Check if email is verified
+                if (isset($authenticatedUser->verified) && !$authenticatedUser->verified) {
+                    Auth::guard('pengguna')->logout();
+                    return redirect()->route('login')
+                        ->with('warning', 'Please verify your email address before logging in.')
+                        ->with('show_resend_link', true)
+                        ->with('user_email', $authenticatedUser->email);
+                }
+                
+                // Pengguna users go to jobs page
+                return redirect()->route('jobs')
+                    ->with('success', 'Login berhasil! Selamat datang ' . $pengguna->first_name);
+            }
+            
+            Log::warning('Pengguna authentication failed for: ' . $credentials['email']);
             return back()->withErrors([
-                'email' => 'Email tidak ditemukan di sistem!',
+                'email' => 'Email atau password salah! Coba lagi.',
             ])->withInput();
         }
         
+        // User found in User table
         Log::info('User found', [
             'id' => $user->id,
             'email' => $user->email,
@@ -83,7 +122,9 @@ class LoginController extends Controller
 
     public function logout(Request $request)
     {
-        Auth::logout();
+        // Logout from both guards to ensure complete logout
+        Auth::guard('web')->logout();
+        Auth::guard('pengguna')->logout();
         
         $request->session()->invalidate();
         $request->session()->regenerateToken();

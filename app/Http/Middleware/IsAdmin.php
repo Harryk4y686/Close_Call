@@ -15,12 +15,15 @@ class IsAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!auth()->check()) {
+        // Check both guards
+        if (!auth()->guard('web')->check() && !auth()->guard('pengguna')->check()) {
             return redirect()->route('login')->with('error', 'Please login first.');
         }
 
-        if (!auth()->user()->is_admin) {
-            return redirect('/')->with('error', 'Unauthorized access. Admin privileges required.');
+        $user = auth()->guard('web')->check() ? auth()->guard('web')->user() : auth()->guard('pengguna')->user();
+
+        if (!isset($user->is_admin) || !$user->is_admin) {
+            return redirect('/profile')->with('error', 'Unauthorized access. Admin privileges required.');
         }
 
         return $next($request);

@@ -306,6 +306,7 @@
             const messageForm = $('#messageForm');
             const sendButton = $('#sendButton');
             const chatPartnerId = {{ $chatPartner->id }};
+            const CURRENT_USER_ID = @json(\Illuminate\Support\Facades\Auth::guard('pengguna')->check() ? \Illuminate\Support\Facades\Auth::guard('pengguna')->id() : \Illuminate\Support\Facades\Auth::guard('web')->id());
 
             // Auto-resize textarea
             messageInput.on('input', function() {
@@ -414,7 +415,7 @@
                         // New messages received
                         const newMessages = messages.slice(currentMessages);
                         newMessages.forEach(function(message) {
-                            if (message.sender_id !== {{ auth()->id() }}) {
+                            if (message.sender_id !== CURRENT_USER_ID) {
                                 addMessageToUI(message.message, false, message.created_at);
                             }
                         });

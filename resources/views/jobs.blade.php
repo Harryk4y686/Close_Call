@@ -728,10 +728,7 @@
         <a href="{{ route('events') }}" class="sidebar-icon" data-page="events">
             <img src="{{ asset('image/events.png') }}" alt="Events" class="sidebar-icon-img">
         </a>
-        <a href="{{ route('chats') }}" class="sidebar-icon" data-page="chats">
-            <img src="{{ asset('image/chats.png') }}" alt="Chats" class="sidebar-icon-img">
-        </a>
-        <a href="{{ route('AI') }}" class="sidebar-icon" data-page="AI">
+        <a href="{{ route('chats') }}" class="sidebar-icon" data-page="AI">
             <img src="{{ asset('image/genius.png') }}" alt="AI" class="sidebar-icon-img">
         </a>
     </div>
@@ -882,7 +879,7 @@
                 </div>
             </div>
             
-            <a href="#" class="see-all-link">See all...</a>
+            <a href="{{ route('jobs.categories') }}" class="see-all-link">See all...</a>
 
             <!-- Open Jobs Section -->
             <h2 class="section-title">Open Jobs</h2>
@@ -932,7 +929,7 @@
                     <a href="#" class="job-apply-btn" data-job="mechanical-engineer">×</a>
                 </div>
             </div>
-            <a href="#" class="see-all-link">See all</a>
+            <a href="{{ route('jobs.opened') }}" class="see-all-link">See all</a>
 
             <!-- Search for Jobs Section -->
             <div class="search-section">

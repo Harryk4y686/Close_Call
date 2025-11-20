@@ -962,10 +962,7 @@
         <a href="{{ route('events') }}" class="sidebar-icon" data-page="events">
             <img src="{{ asset('image/events.png') }}" alt="Events" class="sidebar-icon-img">
         </a>
-        <a href="{{ route('chats') }}" class="sidebar-icon" data-page="chats">
-            <img src="{{ asset('image/chats.png') }}" alt="Chats" class="sidebar-icon-img">
-        </a>
-        <a href="{{ route('AI') }}" class="sidebar-icon" data-page="AI">
+        <a href="{{ route('chats') }}" class="sidebar-icon" data-page="AI">
             <img src="{{ asset('image/genius.png') }}" alt="AI" class="sidebar-icon-img">
         </a>
     </div>

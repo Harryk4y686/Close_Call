@@ -11,11 +11,19 @@ use Illuminate\Support\Facades\Log;
 class EventController extends Controller
 {
     /**
+     * Get authenticated user from either guard
+     */
+    protected function getAuthUser()
+    {
+        return Auth::guard('pengguna')->check() ? Auth::guard('pengguna')->user() : Auth::guard('web')->user();
+    }
+
+    /**
      * Display a listing of events.
      */
     public function index()
     {
-        $user = Auth::user();
+        $user = $this->getAuthUser();
         
         // TEMPORARY FIX: Get the actual database user
         $dbUser = \App\Models\User::find($user->id);
@@ -66,7 +74,7 @@ class EventController extends Controller
      */
     public function create()
     {
-        $user = Auth::user();
+        $user = $this->getAuthUser();
         $profile = $user->registeredProfile;
         return view('createevent', compact('user', 'profile'));
     }
@@ -110,7 +118,7 @@ class EventController extends Controller
             }
 
             // Check if user is authenticated
-            $user = Auth::user();
+            $user = $this->getAuthUser();
             if (!$user) {
                 return redirect()->route('login')->with('error', 'You must be logged in to create events.');
             }
@@ -163,7 +171,7 @@ class EventController extends Controller
     public function show($id)
     {
         $event = Event::with(['creator', 'attendees'])->findOrFail($id);
-        $user = Auth::user();
+        $user = $this->getAuthUser();
         
         // TEMPORARY FIX: Check with database user
         $dbUser = \App\Models\User::find($user->id);
@@ -184,8 +192,8 @@ class EventController extends Controller
      */
     public function edit($id)
     {
-        $event = Event::where('user_id', Auth::id())->findOrFail($id);
-        $user = Auth::user();
+        $user = $this->getAuthUser();
+        $event = Event::where('user_id', $user->id)->findOrFail($id);
         $profile = $user->registeredProfile;
         return view('createevent', compact('event', 'user', 'profile'));
     }
@@ -195,7 +203,8 @@ class EventController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $event = Event::where('user_id', Auth::id())->findOrFail($id);
+        $user = $this->getAuthUser();
+        $event = Event::where('user_id', $user->id)->findOrFail($id);
 
         $validated = $request->validate([
             'event_title' => 'required|string|max:255',
@@ -243,7 +252,7 @@ class EventController extends Controller
      */
     public function destroy($id)
     {
-        $user = Auth::user();
+        $user = $this->getAuthUser();
         
         // TEMPORARY FIX: Get the actual database user
         $dbUser = \App\Models\User::find($user->id);
@@ -274,7 +283,7 @@ class EventController extends Controller
     public function attend(Request $request, $id)
     {
         $event = Event::findOrFail($id);
-        $user = Auth::user();
+        $user = $this->getAuthUser();
 
         // TEMPORARY FIX: Ensure user exists in database
         $dbUser = \App\Models\User::find($user->id);
@@ -314,7 +323,7 @@ class EventController extends Controller
     public function cancelAttendance($id)
     {
         $event = Event::findOrFail($id);
-        $user = Auth::user();
+        $user = $this->getAuthUser();
 
         // TEMPORARY FIX: Ensure user exists in database
         $dbUser = \App\Models\User::find($user->id);

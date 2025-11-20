@@ -17,7 +17,8 @@ class ProfileController extends Controller
     public function index()
     {
         /** @var \App\Models\Pengguna $user */
-        $user = Auth::user();
+        // Get user from either guard
+        $user = Auth::guard('pengguna')->check() ? Auth::guard('pengguna')->user() : Auth::guard('web')->user();
         
         // Load the user with their registered profile using Eloquent relationship
         $user->load('registeredProfile');
@@ -35,8 +36,8 @@ class ProfileController extends Controller
         $request->validate([
             'first_name' => 'nullable|string|max:255',
             'last_name' => 'nullable|string|max:255',
-            'email' => 'nullable|string|email|max:255|unique:pengguna,email,' . Auth::id(),
-            'phone_number' => 'nullable|string|max:20|unique:pengguna,phone_number,' . Auth::id(),
+            'email' => 'nullable|string|email|max:255',
+            'phone_number' => 'nullable|string|max:20',
             'date_of_birth' => 'nullable|date',
             'gender' => 'nullable|in:male,female,other',
             'location' => 'nullable|string|max:255',
@@ -49,7 +50,8 @@ class ProfileController extends Controller
         ]);
 
         /** @var \App\Models\Pengguna $user */
-        $user = Auth::user();
+        // Get user from either guard
+        $user = Auth::guard('pengguna')->check() ? Auth::guard('pengguna')->user() : Auth::guard('web')->user();
         
         // Update basic user information (pengguna table)
         $userUpdateData = [];
@@ -170,7 +172,8 @@ class ProfileController extends Controller
     public function getCompletionPercentage()
     {
         /** @var \App\Models\Pengguna $user */
-        $user = Auth::user();
+        // Get user from either guard
+        $user = Auth::guard('pengguna')->check() ? Auth::guard('pengguna')->user() : Auth::guard('web')->user();
         $profile = $user->registeredProfile;
         
         if ($profile) {
