@@ -484,7 +484,7 @@
         <a href="{{ route('landing-page') }}" class="sidebar-logo">
             <img src="{{ asset('image/logo.png') }}" alt="CloseCall Logo" class="logo-img">
         </a>
-        <a href="{{ route('profile') }}" class="sidebar-icon" data-page="home">
+        <a href="{{ route('landing-page') }}" class="sidebar-icon" data-page="home">
             <img src="{{ asset('image/home.png') }}" alt="Home" class="sidebar-icon-img">
         </a>
         <a href="{{ route('jobs') }}" class="sidebar-icon" data-page="jobs">
@@ -494,7 +494,7 @@
             <img src="{{ asset('image/events.png') }}" alt="Events" class="sidebar-icon-img">
         </a>
         <a href="{{ route('chats') }}" class="sidebar-icon" data-page="AI">
-            <img src="{{ asset('image/genius.png') }}" alt="AI" class="sidebar-icon-img">
+            <img src="{{ asset('image/chats.png') }}" alt="Chats" class="sidebar-icon-img">
         </a>
     </div>
 
@@ -555,22 +555,36 @@
             <div class="events-card">
                 <h2 class="card-title">My events</h2>
                 @if(isset($myEvents) && $myEvents->count() > 0)
-                    <div style="margin-bottom: 20px;">
+                    <div class="events-scroll-container" style="margin-bottom: 20px;">
                         @foreach($myEvents as $event)
-                            <div style="padding: 12px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center;">
-                                <div>
-                                    <h4 style="margin: 0 0 4px 0; font-weight: 600;">{{ $event->title }}</h4>
-                                    <p style="margin: 0; font-size: 14px; color: #6b7280;">{{ $event->formatted_date_time }}</p>
+                            <div class="event-card">
+                                <div class="event-banner">
+                                    <img src="{{ $event->banner_url ?? asset('image/event1.png') }}" alt="{{ $event->title }}" 
+                                         style="width: 100%; height: 100%; object-fit: cover;"
+                                         onerror="this.src='{{ asset('image/event1.png') }}';">
                                 </div>
-                                <div style="display: flex; gap: 8px;">
-                                    <a href="{{ route('events.view', $event->id) }}" style="text-decoration: none;">
-                                        <button class="view-btn" style="padding: 6px 16px; width: auto;">View</button>
-                                    </a>
-                                    <form action="{{ route('events.destroy', $event->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this event?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="view-btn" style="padding: 6px 16px; width: auto; background: #dc2626;">Delete</button>
-                                    </form>
+                                <div class="event-details">
+                                    <p class="event-date">{{ $event->formatted_date_time }}</p>
+                                    <h3 class="event-name">{{ $event->title }}</h3>
+                                    <p class="event-location">{{ $event->location ?? 'Location TBD' }} | {{ $event->attendees_count ?? 0 }} Attendees</p>
+                                    <div class="event-actions">
+                                        <a href="{{ route('events.edit', $event->id) }}">
+                                            <button class="share-btn" style="background: #00A88F;">
+                                                <svg width="16" height="16" fill="white" viewBox="0 0 24 24">
+                                                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                                                </svg>
+                                            </button>
+                                        </a>
+                                        <form action="{{ route('events.destroy', $event->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this event?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="share-btn" style="background: #dc2626;">
+                                                <svg width="16" height="16" fill="white" viewBox="0 0 24 24">
+                                                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                                                </svg>
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
                         @endforeach
@@ -588,17 +602,18 @@
                 <h2 class="recommended-title">Recommended events</h2>
                 
                 <div class="events-scroll-container">
-                    <!-- Event Card 1 -->
+                    <!-- Dynamic Admin Events -->
+                    @foreach($adminEvents as $event)
                     <div class="event-card">
                         <div class="event-banner">
-                            <img src="{{ asset('image/event1.png') }}" alt="JCI Poland National Convention" style="width: 100%; height: 100%; object-fit: cover;">
+                            <img src="{{ $event->banner_image ? asset('storage/' . $event->banner_image) : asset('image/default-event.png') }}" alt="{{ $event->event_name }}" style="width: 100%; height: 100%; object-fit: cover;">
                         </div>
                         <div class="event-details">
-                            <p class="event-date">Sat, 06 Sep 2025, 1:00 AM</p>
-                            <h3 class="event-name">JCI Poland National Online Convention 2025</h3>
-                            <p class="event-location">Poland | 120 Attendees</p>
+                            <p class="event-date">{{ \Carbon\Carbon::parse($event->starting_date)->format('D, d M Y') }}</p>
+                            <h3 class="event-name">{{ $event->event_name }}</h3>
+                            <p class="event-location">{{ $event->location }} | {{ $event->attendees }} Attendees</p>
                             <div class="event-actions">
-                                <a href="{{ route('events.view', 1) }}">
+                                <a href="{{ route('admin.events.view', $event->id) }}">
                                     <button class="view-btn">View</button>
                                 </a>
                                 <button class="share-btn">
@@ -609,72 +624,7 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- Event Card 2 -->
-                    <div class="event-card">
-                        <div class="event-banner">
-                            <img src="{{ asset('image/event2.png') }}" alt="No Matter What Foundation 5K Run/Walk" style="width: 100%; height: 100%; object-fit: cover;">
-                        </div>
-                        <div class="event-details">
-                            <p class="event-date">Sun, 07 Sep 2025, 8:00 AM</p>
-                            <h3 class="event-name">No Matter What Foundation 5K Run/Walk</h3>
-                            <p class="event-location">East Islip | 85 Attendees</p>
-                            <div class="event-actions">
-                                <a href="{{ route('events.view', 2) }}">
-                                    <button class="view-btn">View</button>
-                                </a>
-                                <button class="share-btn">
-                                    <svg width="16" height="16" fill="white" viewBox="0 0 24 24">
-                                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Event Card 3 -->
-                    <div class="event-card">
-                        <div class="event-banner">
-                            <img src="{{ asset('image/event3.png') }}" alt="6th Congress on Intelligent Systems" style="width: 100%; height: 100%; object-fit: cover;">
-                        </div>
-                        <div class="event-details">
-                            <p class="event-date">Mon, 08 Sep 2025, 9:00 AM</p>
-                            <h3 class="event-name">6th Congress on Intelligent Systems 2025</h3>
-                            <p class="event-location">Hybrid | 200 Attendees</p>
-                            <div class="event-actions">
-                                <a href="{{ route('events.view', 3) }}">
-                                    <button class="view-btn">View</button>
-                                </a>
-                                <button class="share-btn">
-                                    <svg width="16" height="16" fill="white" viewBox="0 0 24 24">
-                                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Event Card 4 -->
-                    <div class="event-card">
-                        <div class="event-banner">
-                            <img src="{{ asset('image/event4.png') }}" alt="The NGO Whisperer Masterclass" style="width: 100%; height: 100%; object-fit: cover;">
-                        </div>
-                        <div class="event-details">
-                            <p class="event-date">Tue, 09 Sep 2025, 2:00 PM</p>
-                            <h3 class="event-name">The NGO Whisperer Masterclass</h3>
-                            <p class="event-location">Virtual | 45 Attendees</p>
-                            <div class="event-actions">
-                                <a href="{{ route('events.view', 4) }}">
-                                    <button class="view-btn">View</button>
-                                </a>
-                                <button class="share-btn">
-                                    <svg width="16" height="16" fill="white" viewBox="0 0 24 24">
-                                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                    @endforeach
                 </div>
 
                 <a href="#" class="see-all-link">See all</a>

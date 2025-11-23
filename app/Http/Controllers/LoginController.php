@@ -31,6 +31,33 @@ class LoginController extends Controller
             'password_length' => strlen($credentials['password'])
         ]);
         
+        // Check if user exists in AdminUser table
+        $adminUser = \App\Models\AdminUser::where('email', $credentials['email'])->first();
+        
+        if ($adminUser) {
+            Log::info('Admin user found, attempting password authentication', [
+                'id' => $adminUser->id,
+                'email' => $adminUser->email
+            ]);
+            
+            // Attempt authentication with password
+            if (Auth::guard('admin_user')->attempt($credentials)) {
+                Auth::shouldUse('admin_user');
+                
+                Log::info('Admin user login successful', ['user_id' => $adminUser->id]);
+                
+                // Redirect to jobs page
+                return redirect()->route('jobs')
+                    ->with('success', 'Welcome ' . $adminUser->first_name . '!');
+            }
+            
+            // Password incorrect for admin user
+            Log::warning('Admin user password incorrect: ' . $credentials['email']);
+            return back()->withErrors([
+                'email' => 'Email atau password salah! Coba lagi.',
+            ])->withInput();
+        }
+        
         // Check if user exists in User table first
         $user = \App\Models\User::where('email', $credentials['email'])->first();
         
@@ -122,9 +149,10 @@ class LoginController extends Controller
 
     public function logout(Request $request)
     {
-        // Logout from both guards to ensure complete logout
+        // Logout from all guards to ensure complete logout
         Auth::guard('web')->logout();
         Auth::guard('pengguna')->logout();
+        Auth::guard('admin_user')->logout();
         
         $request->session()->invalidate();
         $request->session()->regenerateToken();

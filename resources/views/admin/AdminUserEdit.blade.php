@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile - CloseCall</title>
+    <title>Admin - User Edit</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @keyframes slideInSoft {
@@ -382,17 +382,20 @@
         <div class="sidebar-logo">
             <img src="{{ asset('image/logo.png') }}" alt="CloseCall Logo" class="logo-img">
         </div>
-        <a href="{{ route('profile') }}" class="sidebar-icon active" data-page="home">
+        <a href="{{ route('AdminDashboard') }}" class="sidebar-icon" data-page="home">
             <img src="{{ asset('image/home.png') }}" alt="Home" class="sidebar-icon-img">
         </a>
-        <a href="{{ route('jobs') }}" class="sidebar-icon" data-page="jobs">
+        <a href="{{ route('AdminUserDatabase') }}" class="sidebar-icon active" data-page="users">
+            <img src="{{ asset('image/users.png') }}" alt="Users" class="sidebar-icon-img">
+        </a>
+        <a href="{{ route('AdminJobDatabase') }}" class="sidebar-icon" data-page="jobs">
             <img src="{{ asset('image/jobs.png') }}" alt="Jobs" class="sidebar-icon-img">
         </a>
-        <a href="{{ route('events') }}" class="sidebar-icon" data-page="events">
+        <a href="{{ route('AdminEventDatabase') }}" class="sidebar-icon" data-page="events">
             <img src="{{ asset('image/events.png') }}" alt="Events" class="sidebar-icon-img">
         </a>
-        <a href="{{ route('AI') }}" class="sidebar-icon" data-page="AI">
-            <img src="{{ asset('image/genius.png') }}" alt="AI" class="sidebar-icon-img">
+        <a href="{{ route('AdminCompanyDatabase') }}" class="sidebar-icon" data-page="companies">
+            <img src="{{ asset('image/company.png') }}" alt="Companies" class="sidebar-icon-img">
         </a>
     </div>
 
@@ -400,40 +403,36 @@
     <div class="main-content">
         <!-- Header -->
         <div class="header">
-            <div class="search-bar">
-                <svg width="18" height="18" fill="#6b7280" viewBox="0 0 24 24">
-                    <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-                </svg>
-                <input type="text" placeholder="Search...">
-            </div>
-            <a href="#" class="notification-icon">
-                <svg width="18" height="18" fill="#6b7280" viewBox="0 0 24 24">
-                    <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
-                </svg>
-            </a>
-            <a href="{{ route('profile') }}" class="avatar-icon">
-                <svg width="18" height="18" fill="#6b7280" viewBox="0 0 24 24">
-                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                </svg>
-            </a>
         </div>
 
         <!-- Content Wrapper -->
         <div class="content-wrapper">
             <!-- Main Section -->
             <div class="main-section">
-                <!-- Profile Header -->
-                <div class="profile-header">
-                    <div class="profile-buttons">
-                        <button class="btn-edit">Edit Profile</button>
-                        <button class="btn-edit">Edit Banner</button>
+                <form action="{{ route('adminuseredit.update', $user->id) }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT')
+                    
+                    <!-- Hidden file inputs -->
+                    <input type="file" id="profile-upload" name="profile_picture" accept="image/*" style="display: none;">
+                    <input type="file" id="banner-upload" name="banner_image" accept="image/*" style="display: none;">
+                    
+                    <!-- Profile Header -->
+                    <div class="profile-header" style="background-image: url('{{ optional($user->registeredProfile)->banner_image ? asset('storage/' . $user->registeredProfile->banner_image) : asset('image/defaultbanner.png') }}');">
+                        <div class="profile-buttons">
+                            <button type="button" class="btn-edit" onclick="document.getElementById('profile-upload').click()">Edit Profile</button>
+                            <button type="button" class="btn-edit" onclick="document.getElementById('banner-upload').click()">Edit Banner</button>
+                        </div>
+                        <div class="profile-avatar">
+                            @if(optional($user->registeredProfile)->profile_picture)
+                                <img src="{{ asset('storage/' . $user->registeredProfile->profile_picture) }}" alt="Profile Picture">
+                            @else
+                                <svg width="60" height="60" fill="#9ca3af" viewBox="0 0 24 24">
+                                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                </svg>
+                            @endif
+                        </div>
                     </div>
-                    <div class="profile-avatar">
-                        <svg width="60" height="60" fill="#9ca3af" viewBox="0 0 24 24">
-                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                        </svg>
-                    </div>
-                </div>
 
                 <div class="form-card">
                     <!-- Personal Information Section -->
@@ -441,40 +440,45 @@
                     <div class="form-grid">
                         <div class="form-group">
                             <label><b>First name</b></label>
-                            <input type="text" placeholder="Enter your first name">
+                            <input type="text" name="first_name" value="{{ $user->first_name }}" placeholder="Enter your first name" required>
                         </div>
                         <div class="form-group">
                             <label><b>Last name</b></label>
-                            <input type="text" placeholder="Enter your last name">
+                            <input type="text" name="last_name" value="{{ $user->last_name }}" placeholder="Enter your last name" required>
                         </div>
                         <div class="form-group">
                             <label><b>Email</b></label>
-                            <input type="email" placeholder="Enter your email">
+                            <input type="email" name="email" value="{{ $user->email }}" placeholder="Enter your email" required>
                         </div>
                         <div class="form-group">
                             <label><b>Mobile Number</b></label>
-                            <input type="tel" placeholder="Enter your mobile number">
+                            <input type="tel" name="phone_number" value="{{ $user->phone_number }}" placeholder="Enter your mobile number" required>
                         </div>
                         <div class="form-group">
                             <label><b>Date of Birth</b></label>
-                            <input type="date" placeholder="Select your date of birth">
+                            <input type="date" name="date_of_birth" value="{{ optional($user->registeredProfile)->date_of_birth ? \Carbon\Carbon::parse($user->registeredProfile->date_of_birth)->format('Y-m-d') : '' }}" placeholder="Select your date of birth" required>
                         </div>
                         <div class="form-group">
                             <label><b>Gender</b></label>
-                            <select>
-                                <option value="" disabled selected>Select your gender</option>
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
-                                <option value="other">Other</option>
+                            <select name="gender">
+                                <option value="" disabled {{ !optional($user->registeredProfile)->gender ? 'selected' : '' }}>Select your gender</option>
+                                <option value="male" {{ optional($user->registeredProfile)->gender == 'male' ? 'selected' : '' }}>Male</option>
+                                <option value="female" {{ optional($user->registeredProfile)->gender == 'female' ? 'selected' : '' }}>Female</option>
+                                <option value="other" {{ optional($user->registeredProfile)->gender == 'other' ? 'selected' : '' }}>Other</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label><b>Location</b></label>
-                            <input type="text" placeholder="Enter your location">
+                            <input type="text" name="location" value="{{ optional($user->registeredProfile)->location }}" placeholder="Enter your location" required>
                         </div>
                         <div class="form-group">
                             <label><b>Postal Code</b></label>
-                            <input type="text" placeholder="Enter your postal code">
+                            <input type="text" name="postal_code" value="{{ optional($user->registeredProfile)->postal_code }}" placeholder="Enter your postal code" required>
+                        </div>
+                        <div class="form-group">
+                            <label><b>Password</b></label>
+                            <input type="password" name="password" placeholder="Leave blank to keep current password">
+                            <small style="color: #666; font-size: 12px;">Enter new password only if you want to change it</small>
                         </div>
                     </div>
 
@@ -484,38 +488,63 @@
                     <div class="upload-section">
                         <h3 class="upload-title">Upload Your Resume</h3>
                         <div class="upload-container">
-                            <button class="upload-btn">
-                                <img src="{{ asset('image/upload.png') }}" alt="Resume Icon" class="upload-icon">
-                                <b>Upload Resume</b>
-                            </button>
-                            <button class="cancel-btn" style="display: none;" onclick="cancelFile(this)">×</button>
+                            @if(optional($user->registeredProfile)->resume_path)
+                                <a href="{{ asset('storage/' . $user->registeredProfile->resume_path) }}" target="_blank" class="upload-btn file-selected" style="text-decoration: none;">
+                                    <img src="{{ asset('image/upload.png') }}" alt="Resume Icon" class="upload-icon">
+                                    <b>{{ basename($user->registeredProfile->resume_path) }}</b>
+                                </a>
+                                <button type="button" class="cancel-btn" style="display: flex;" onclick="deleteFile(this, 'resume')">×</button>
+                            @else
+                                <button type="button" class="upload-btn" data-file-type="resume">
+                                    <img src="{{ asset('image/upload.png') }}" alt="Resume Icon" class="upload-icon">
+                                    <b>Upload Resume</b>
+                                </button>
+                                <button type="button" class="cancel-btn" style="display: none;" onclick="cancelFile(this)">×</button>
+                            @endif
                         </div>
                     </div>
 
                     <div class="upload-section">
                         <h3 class="upload-title">Upload Your Curriculum Vitae</h3>
                         <div class="upload-container">
-                            <button class="upload-btn">
-                                <img src="{{ asset('image/upload.png') }}" alt="CV Icon" class="upload-icon">
-                                <b>Upload CV</b>
-                            </button>
-                            <button class="cancel-btn" style="display: none;" onclick="cancelFile(this)">×</button>
+                            @if(optional($user->registeredProfile)->cv_path)
+                                <a href="{{ asset('storage/' . $user->registeredProfile->cv_path) }}" target="_blank" class="upload-btn file-selected" style="text-decoration: none;">
+                                    <img src="{{ asset('image/upload.png') }}" alt="CV Icon" class="upload-icon">
+                                    <b>{{ basename($user->registeredProfile->cv_path) }}</b>
+                                </a>
+                                <button type="button" class="cancel-btn" style="display: flex;" onclick="deleteFile(this, 'cv')">×</button>
+                            @else
+                                <button type="button" class="upload-btn" data-file-type="cv">
+                                    <img src="{{ asset('image/upload.png') }}" alt="CV Icon" class="upload-icon">
+                                    <b>Upload CV</b>
+                                </button>
+                                <button type="button" class="cancel-btn" style="display: none;" onclick="cancelFile(this)">×</button>
+                            @endif
                         </div>
                     </div>
 
                     <div class="upload-section">
                         <h3 class="upload-title">Upload Your Portfolio</h3>
                         <div class="upload-container">
-                            <button class="upload-btn">
-                                <img src="{{ asset('image/upload.png') }}" alt="Portfolio Icon" class="upload-icon">
-                                <b>Upload Portfolio</b>
-                            </button>
-                            <button class="cancel-btn" style="display: none;" onclick="cancelFile(this)">×</button>
+                            @if(optional($user->registeredProfile)->portfolio_path)
+                                <a href="{{ asset('storage/' . $user->registeredProfile->portfolio_path) }}" target="_blank" class="upload-btn file-selected" style="text-decoration: none;">
+                                    <img src="{{ asset('image/upload.png') }}" alt="Portfolio Icon" class="upload-icon">
+                                    <b>{{ basename($user->registeredProfile->portfolio_path) }}</b>
+                                </a>
+                                <button type="button" class="cancel-btn" style="display: flex;" onclick="deleteFile(this, 'portfolio')">×</button>
+                            @else
+                                <button type="button" class="upload-btn" data-file-type="portfolio">
+                                    <img src="{{ asset('image/upload.png') }}" alt="Portfolio Icon" class="upload-icon">
+                                    <b>Upload Portfolio</b>
+                                </button>
+                                <button type="button" class="cancel-btn" style="display: none;" onclick="cancelFile(this)">×</button>
+                            @endif
                         </div>
                     </div>
                 </div>
 
-                <button class="save-btn">Save</button>
+                <button type="submit" class="save-btn">Save</button>
+                </form>
                 </div>
             </div>
         </div>
@@ -525,68 +554,63 @@
         // Add smooth scrolling behavior
         document.documentElement.style.scrollBehavior = 'smooth';
 
-        // Handle upload button clicks
-        document.querySelectorAll('.upload-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                // Create file input
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.accept = '.png,.jpg,.jpeg';
-                
-                input.addEventListener('change', function(e) {
-                    if (e.target.files.length > 0) {
-                        const fileName = e.target.files[0].name;
-                        const originalText = btn.querySelector('b').textContent;
-                        const cancelBtn = btn.parentElement.querySelector('.cancel-btn');
-                        
-                        btn.innerHTML = `
-                            <img src="{{ asset('image/upload.png') }}" alt="Upload Icon" class="upload-icon">
-                            <b>${fileName}</b>
-                        `;
-                        btn.classList.add('file-selected');
-                        btn.style.cursor = 'default';
-                        cancelBtn.style.display = 'flex';
-                        
-                        // Store original content for reset
-                        btn.setAttribute('data-original', originalText);
-                    }
-                });
-                
-                input.click();
-            });
-        });
-
-        // Cancel file function
-        function cancelFile(cancelBtn) {
-            const uploadContainer = cancelBtn.closest('.upload-container');
-            const uploadBtn = uploadContainer.querySelector('.upload-btn');
-            const originalText = uploadBtn.getAttribute('data-original');
+        // Function to handle file deletion
+        function deleteFile(button, fileType) {
+            const uploadContainer = button.closest('.upload-container');
+            const link = uploadContainer.querySelector('.upload-btn');
             
-            uploadBtn.innerHTML = `
-                <img src="{{ asset('image/upload.png') }}" alt="Upload Icon" class="upload-icon">
-                <b>${originalText}</b>
+            // Create hidden input to mark file for deletion
+            const form = document.querySelector('form');
+            let deleteInput = form.querySelector(`input[name="delete_${fileType}"]`);
+            if (!deleteInput) {
+                deleteInput = document.createElement('input');
+                deleteInput.type = 'hidden';
+                deleteInput.name = `delete_${fileType}`;
+                deleteInput.value = '1';
+                form.appendChild(deleteInput);
+            }
+            
+            // Replace link with upload button
+            uploadContainer.innerHTML = `
+                <button type="button" class="upload-btn" data-file-type="${fileType}">
+                    <img src="{{ asset('image/upload.png') }}" alt="Upload Icon" class="upload-icon">
+                    <b>Upload ${fileType.charAt(0).toUpperCase() + fileType.slice(1)}</b>
+                </button>
+                <button type="button" class="cancel-btn" style="display: none;" onclick="cancelFile(this)">×</button>
             `;
-            uploadBtn.classList.remove('file-selected');
-            uploadBtn.style.cursor = 'pointer';
-            uploadBtn.removeAttribute('data-original');
-            cancelBtn.style.display = 'none';
         }
 
-        // Handle save button
-        document.querySelector('.save-btn').addEventListener('click', function() {
-            this.textContent = 'Adding...';
-            this.disabled = true;
-            
-            setTimeout(() => {
-                this.textContent = 'Added!';
-                this.style.background = '#10b981';
+        // Handle profile picture upload preview
+        document.getElementById('profile-upload').addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                const file = e.target.files[0];
+                const reader = new FileReader();
                 
-                setTimeout(() => {
-                    this.textContent = 'Add';
-                    this.disabled = false;
-                    this.style.background = '#00A88F';
-                }, 2000);
-            }, 1500);
+                reader.onload = function(e) {
+                    const profileAvatar = document.querySelector('.profile-avatar');
+                    profileAvatar.innerHTML = `<img src="${e.target.result}" alt="Profile Picture">`;
+                };
+                
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Handle banner upload preview
+        document.getElementById('banner-upload').addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const profileHeader = document.querySelector('.profile-header');
+                    profileHeader.style.backgroundImage = `url(${e.target.result})`;
+                    profileHeader.style.backgroundSize = 'cover';
+                    profileHeader.style.backgroundPosition = 'center';
+                    profileHeader.style.backgroundRepeat = 'no-repeat';
+                };
+                
+                reader.readAsDataURL(file);
+            }
         });
 
         // Handle sidebar navigation
@@ -604,55 +628,6 @@
                 document.querySelectorAll('.sidebar-icon').forEach(i => i.classList.remove('active'));
                 this.classList.add('active');
             });
-        });
-
-        // Handle Edit Profile button
-        document.querySelector('.btn-edit').addEventListener('click', function() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*';
-            
-            input.addEventListener('change', function(e) {
-                if (e.target.files.length > 0) {
-                    const file = e.target.files[0];
-                    const reader = new FileReader();
-                    
-                    reader.onload = function(e) {
-                        const profileAvatar = document.querySelector('.profile-avatar');
-                        profileAvatar.innerHTML = `<img src="${e.target.result}" alt="Profile Picture">`;
-                    };
-                    
-                    reader.readAsDataURL(file);
-                }
-            });
-            
-            input.click();
-        });
-
-        // Handle Edit Banner button
-        document.querySelectorAll('.btn-edit')[1].addEventListener('click', function() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*';
-            
-            input.addEventListener('change', function(e) {
-                if (e.target.files.length > 0) {
-                    const file = e.target.files[0];
-                    const reader = new FileReader();
-                    
-                    reader.onload = function(e) {
-                        const profileHeader = document.querySelector('.profile-header');
-                        profileHeader.style.background = `url(${e.target.result})`;
-                        profileHeader.style.backgroundSize = 'cover';
-                        profileHeader.style.backgroundPosition = 'center';
-                        profileHeader.style.backgroundRepeat = 'no-repeat';
-                    };
-                    
-                    reader.readAsDataURL(file);
-                }
-            });
-            
-            input.click();
         });
     </script>
 </body>

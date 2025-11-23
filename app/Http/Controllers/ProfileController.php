@@ -16,15 +16,35 @@ class ProfileController extends Controller
      */
     public function index()
     {
-        /** @var \App\Models\Pengguna $user */
-        // Get user from either guard
-        $user = Auth::guard('pengguna')->check() ? Auth::guard('pengguna')->user() : Auth::guard('web')->user();
-        
-        // Load the user with their registered profile using Eloquent relationship
-        $user->load('registeredProfile');
-        $profile = $user->registeredProfile;
+        // Admin users: use their own data directly, no profile
+        if (Auth::guard('admin_user')->check()) {
+            $user = Auth::guard('admin_user')->user();
+            $profile = null;
+        } else {
+            $user = Auth::guard('pengguna')->check() ? Auth::guard('pengguna')->user() : Auth::guard('web')->user();
+            $user->load('registeredProfile');
+            $profile = $user->registeredProfile;
+        }
         
         return view('profile', compact('user', 'profile'));
+    }
+
+    /**
+     * Display the edit profile page
+     */
+    public function edit()
+    {
+        // Admin users: use their own data directly, no profile
+        if (Auth::guard('admin_user')->check()) {
+            $user = Auth::guard('admin_user')->user();
+            $profile = null;
+        } else {
+            $user = Auth::guard('pengguna')->check() ? Auth::guard('pengguna')->user() : Auth::guard('web')->user();
+            $user->load('registeredProfile');
+            $profile = $user->registeredProfile;
+        }
+        
+        return view('editProfile', compact('user', 'profile'));
     }
 
     /**
@@ -49,11 +69,54 @@ class ProfileController extends Controller
             'portfolio' => 'nullable|file|mimes:pdf,doc,docx,png,jpg,jpeg|max:2048',
         ]);
 
-        /** @var \App\Models\Pengguna $user */
-        // Get user from either guard
+        // Admin users: update admin_users table only, no profile
+        if (Auth::guard('admin_user')->check()) {
+            $user = Auth::guard('admin_user')->user();
+            
+            $updateData = [];
+            $fields = ['first_name', 'last_name', 'email', 'phone_number', 'date_of_birth', 'gender', 'location', 'postal_code'];
+            foreach ($fields as $field) {
+                if ($request->filled($field)) {
+                    $updateData[$field] = $request->input($field);
+                }
+            }
+            
+            // Handle file uploads for admin users
+            if ($request->hasFile('profile_picture')) {
+                $path = $request->file('profile_picture')->store('profile_pictures', 'public');
+                $updateData['profile_picture'] = $path;
+            }
+            if ($request->hasFile('banner_image')) {
+                $path = $request->file('banner_image')->store('banner_images', 'public');
+                $updateData['banner_image'] = $path;
+            }
+            if ($request->hasFile('resume')) {
+                $path = $request->file('resume')->store('resumes', 'public');
+                $updateData['resume'] = $path;
+            }
+            if ($request->hasFile('cv')) {
+                $path = $request->file('cv')->store('cvs', 'public');
+                $updateData['cv'] = $path;
+            }
+            if ($request->hasFile('portfolio')) {
+                $path = $request->file('portfolio')->store('portfolios', 'public');
+                $updateData['portfolio'] = $path;
+            }
+            
+            $user->update($updateData);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Profile updated successfully!',
+                'user' => $user->fresh(),
+                'profile' => null
+            ]);
+        }
+        
+        // Regular users: use pengguna + pengguna_registered
         $user = Auth::guard('pengguna')->check() ? Auth::guard('pengguna')->user() : Auth::guard('web')->user();
         
-        // Update basic user information (pengguna table)
+        // Update basic user information
         $userUpdateData = [];
         $userFields = ['first_name', 'last_name', 'email', 'phone_number'];
         foreach ($userFields as $field) {
@@ -72,7 +135,7 @@ class ProfileController extends Controller
             $profile = new PenggunaRegistered(['pengguna_id' => $user->id]);
         }
 
-        // Update profile data (pengguna_registered table)
+        // Update profile data
         $profileUpdateData = [];
         $profileFields = ['date_of_birth', 'gender', 'location', 'postal_code'];
         foreach ($profileFields as $field) {
@@ -81,25 +144,7 @@ class ProfileController extends Controller
             }
         }
 
-        // Handle file uploads
-        if ($request->hasFile('profile_picture')) {
-            Log::info('Profile picture upload detected', [
-                'original_name' => $request->file('profile_picture')->getClientOriginalName(),
-                'size' => $request->file('profile_picture')->getSize(),
-                'mime_type' => $request->file('profile_picture')->getMimeType()
-            ]);
-            
-            // Delete old profile picture if exists
-            if ($profile->profile_picture && Storage::exists('public/' . $profile->profile_picture)) {
-                Storage::delete('public/' . $profile->profile_picture);
-                Log::info('Deleted old profile picture: ' . $profile->profile_picture);
-            }
-            
-            $path = $request->file('profile_picture')->store('profile_pictures', 'public');
-            $profileUpdateData['profile_picture'] = $path;
-            
-            Log::info('Profile picture saved to: ' . $path);
-        }
+
 
         if ($request->hasFile('banner_image')) {
             // Delete old banner image if exists
@@ -109,6 +154,11 @@ class ProfileController extends Controller
             
             $path = $request->file('banner_image')->store('banner_images', 'public');
             $profileUpdateData['banner_image'] = $path;
+            
+            // Sync to admin_users table if admin user
+            if ($isAdminUser) {
+                $user->update(['banner_image' => $path]);
+            }
         }
 
         if ($request->hasFile('resume')) {
@@ -119,6 +169,11 @@ class ProfileController extends Controller
             
             $path = $request->file('resume')->store('resumes', 'public');
             $profileUpdateData['resume_path'] = $path;
+            
+            // Sync to admin_users table if admin user
+            if ($isAdminUser) {
+                $user->update(['resume' => $path]);
+            }
         }
 
         if ($request->hasFile('cv')) {
@@ -129,6 +184,11 @@ class ProfileController extends Controller
             
             $path = $request->file('cv')->store('cvs', 'public');
             $profileUpdateData['cv_path'] = $path;
+            
+            // Sync to admin_users table if admin user
+            if ($isAdminUser) {
+                $user->update(['cv' => $path]);
+            }
         }
 
         if ($request->hasFile('portfolio')) {
@@ -139,6 +199,11 @@ class ProfileController extends Controller
             
             $path = $request->file('portfolio')->store('portfolios', 'public');
             $profileUpdateData['portfolio_path'] = $path;
+            
+            // Sync to admin_users table if admin user
+            if ($isAdminUser) {
+                $user->update(['portfolio' => $path]);
+            }
         }
 
         // Update or create profile
@@ -146,12 +211,21 @@ class ProfileController extends Controller
             if ($profile->exists) {
                 $profile->update($profileUpdateData);
             } else {
-                $profileUpdateData['pengguna_id'] = $user->id;
+                // Add the correct foreign key based on user type
+                if ($isAdminUser) {
+                    $profileUpdateData['admin_user_id'] = $user->id;
+                } else {
+                    $profileUpdateData['pengguna_id'] = $user->id;
+                }
                 $profile = PenggunaRegistered::create($profileUpdateData);
             }
-        } else if (!$profile) {
+        } else if (!$profile->exists) {
             // Create empty profile if it doesn't exist
-            $profile = PenggunaRegistered::create(['pengguna_id' => $user->id]);
+            if ($isAdminUser) {
+                $profile = PenggunaRegistered::create(['admin_user_id' => $user->id]);
+            } else {
+                $profile = PenggunaRegistered::create(['pengguna_id' => $user->id]);
+            }
         }
 
         // Calculate and save completion percentage
@@ -171,16 +245,28 @@ class ProfileController extends Controller
      */
     public function getCompletionPercentage()
     {
-        /** @var \App\Models\Pengguna $user */
-        // Get user from either guard
+        // Admin users: calculate from admin_users table
+        if (Auth::guard('admin_user')->check()) {
+            $user = Auth::guard('admin_user')->user();
+            $fields = ['first_name', 'last_name', 'email', 'phone_number', 'date_of_birth', 'gender', 'location', 'postal_code', 'profile_picture', 'resume', 'cv', 'portfolio'];
+            $filled = 0;
+            foreach ($fields as $field) {
+                if (!empty($user->$field)) $filled++;
+            }
+            $completionPercentage = round(($filled / count($fields)) * 100);
+            return response()->json([
+                'completion_percentage' => $completionPercentage,
+                'has_profile' => true
+            ]);
+        }
+        
+        // Regular users: use pengguna_registered
         $user = Auth::guard('pengguna')->check() ? Auth::guard('pengguna')->user() : Auth::guard('web')->user();
         $profile = $user->registeredProfile;
         
         if ($profile) {
-            // Return saved percentage from database
             $completionPercentage = $profile->completion_percentage;
         } else {
-            // If no profile exists, start from 0%
             $completionPercentage = 0;
         }
 

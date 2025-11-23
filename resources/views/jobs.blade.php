@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Jobs - CloseCall</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -719,7 +720,7 @@
         <a href="{{ route('landing-page') }}" class="sidebar-logo">
             <img src="{{ asset('image/logo.png') }}" alt="CloseCall Logo" class="logo-img">
         </a>
-        <a href="{{ route('profile') }}" class="sidebar-icon" data-page="home">
+        <a href="{{ route('landing-page') }}" class="sidebar-icon" data-page="home">
             <img src="{{ asset('image/home.png') }}" alt="Home" class="sidebar-icon-img">
         </a>
         <a href="{{ route('jobs') }}" class="sidebar-icon active" data-page="jobs">
@@ -729,7 +730,7 @@
             <img src="{{ asset('image/events.png') }}" alt="Events" class="sidebar-icon-img">
         </a>
         <a href="{{ route('chats') }}" class="sidebar-icon" data-page="AI">
-            <img src="{{ asset('image/genius.png') }}" alt="AI" class="sidebar-icon-img">
+            <img src="{{ asset('image/chats.png') }}" alt="Chats" class="sidebar-icon-img">
         </a>
     </div>
 
@@ -884,21 +885,7 @@
             <!-- Open Jobs Section -->
             <h2 class="section-title">Open Jobs</h2>
             <div class="jobs-list">
-                <div class="job-card">
-                    <img src="{{ asset('image/dataanalyst.png') }}" alt="Data Analyst" class="job-logo">
-                    <div class="job-details">
-                        <div class="job-title">Data Analyst</div>
-                        <div class="job-company">Indonesia | GRHA Digital</div>
-                        <div class="job-status">
-                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
-                            </svg>
-                            Actively reviewing applications
-                        </div>
-                    </div>
-                    <a href="#" class="job-apply-btn" data-job="data-analyst">×</a>
-                </div>
-
+                <!-- Best Partner Job (Always First) -->
                 <div class="job-card" style="cursor: pointer;" title="Click to apply for this position">
                     <img src="{{ asset('image/socialmediamanager.png') }}" alt="Social Media Manager" class="job-logo">
                     <div class="job-details">
@@ -911,14 +898,16 @@
                             Actively reviewing applications
                         </div>
                     </div>
-                    <a href="#" class="job-apply-btn" data-job="social-media-manager" data-apply-url="{{ route('bestpartnerjob') }}">×</a>
+                    <a href="#" class="job-apply-btn" data-job="social-media-manager" data-apply-url="#">×</a>
                 </div>
 
-                <div class="job-card">
-                    <img src="{{ asset('image/mechanicalengineer.png') }}" alt="Mechanical Engineer" class="job-logo">
+                <!-- Dynamic Admin Jobs (Max 3) -->
+                @foreach($openJobs as $job)
+                <div class="job-card" data-job-id="{{ $job->id }}">
+                    <img src="{{ $job->profile_picture ? asset('storage/' . $job->profile_picture) : asset('image/default-job.png') }}" alt="{{ $job->job_name }}" class="job-logo">
                     <div class="job-details">
-                        <div class="job-title">Mechanical Engineer</div>
-                        <div class="job-company">Indonesia | R-Tech Computer</div>
+                        <div class="job-title">{{ $job->job_name }}</div>
+                        <div class="job-company">{{ $job->location }} | {{ $job->company }}</div>
                         <div class="job-status">
                             <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
@@ -926,8 +915,9 @@
                             Actively reviewing applications
                         </div>
                     </div>
-                    <a href="#" class="job-apply-btn" data-job="mechanical-engineer">×</a>
+                    <a href="#" class="job-apply-btn delete-job-btn" data-job-id="{{ $job->id }}">×</a>
                 </div>
+                @endforeach
             </div>
             <a href="{{ route('jobs.opened') }}" class="see-all-link">See all</a>
 
@@ -938,7 +928,7 @@
                     <svg class="search-icon-large" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
                     </svg>
-                    <input type="text" class="search-input-large" placeholder="Search...">
+                    <input type="text" id="jobSearchInput" class="search-input-large" placeholder="Search...">
                 </div>
 
                 <div class="suggested-section">
@@ -956,8 +946,8 @@
             </div>
 
                 <!-- Detailed Jobs (matches provided mock) -->
-                <div class="detailed-jobs-section">
-                    <!-- Card 1 -->
+                <div class="detailed-jobs-section" id="jobsContainer">
+                    <!-- Card 1 - Best Partner (Always First) -->
                     <div class="djob-card">
                         <div class="djob-header">
                             <img style="width: 65px; height:65px" src="{{ asset('image/socialmediamanager.png') }}" class="djob-logo" alt="Logo">
@@ -965,7 +955,7 @@
                                 <div class="djob-title-row">
                                     <div class="djob-title">Social Media Manager</div>
                                     <div class="djob-actions">
-                                        <a href="{{ route('bestpartnerjob') }}" class="djob-apply">+ Apply</a>
+                                        <a href="#" class="djob-apply">+ Apply</a>
                                         <a href="#" class="djob-more" aria-label="More options">
                                             <svg width="20" height="20" viewBox="0 0 24 24" fill="#111827"><circle cx="12" cy="9" r="2"/><circle cx="12" cy="15" r="2"/></svg>
                                         </a>
@@ -988,7 +978,7 @@
                         </div>
                         <div class="djob-desc">
                             <strong>Project Overview</strong><br>
-                            You will be exploring badge art concepts that align with our platform’s tone and user experience. This is a short exploratory engagement to review your approach and see how it could evolve across a full slate of achievements. If your work aligns with our vision, there is potential for a longer-term engagement to illustrate the full badge set and other visual assets across the platform.
+                            You will be exploring badge art concepts that align with our platform's tone and user experience. This is a short exploratory engagement to review your approach and see how it could evolve across a full slate of achievements. If your work aligns with our vision, there is potential for a longer-term engagement to illustrate the full badge set and other visual assets across the platform.
                         </div>
                         <div class="djob-tags">
                             <span class="dtag">#remote</span>
@@ -998,21 +988,22 @@
                         </div>
                     </div>
 
-                    <!-- Card 2 -->
-                    <div class="djob-card">
+                    <!-- Dynamic Admin Jobs -->
+                    @foreach($detailedJobs as $job)
+                    <div class="djob-card" data-job-id="{{ $job->id }}">
                         <div class="djob-header">
-                            <img style="width: 65px; height:65px" src="{{ asset('image/soechi.png') }}" class="djob-logo" alt="Logo">
+                            <img style="width: 65px; height:65px" src="{{ $job->profile_picture ? asset('storage/' . $job->profile_picture) : asset('image/default-job.png') }}" class="djob-logo" alt="Logo">
                             <div class="djob-headcol">
                                 <div class="djob-title-row">
-                                    <div class="djob-title">Graphic Designer</div>
+                                    <div class="djob-title">{{ $job->job_name }}</div>
                                     <div class="djob-actions">
                                         <a href="#" class="djob-apply">+ Apply</a>
                                         <a href="#" class="djob-more" aria-label="More options">
-                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="#111827"><circle cx="12" cy="9" r="2"/><circle cx="12" cy="15" r="2"/></svg>
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="#111827"><circle cx="12" cy="9" r="2"/><circle cx="12" cy="15" r="2"/></svg>
                                         </a>
                                     </div>
                                 </div>
-                                <div class="djob-subinfo">Indonesia | SOECHI Group</div>
+                                <div class="djob-subinfo">{{ $job->location }} | {{ $job->company }}</div>
                                 <div class="djob-meta">
                                     <span class="djob-meta-item djob-meta-item--green">
                                         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
@@ -1023,60 +1014,18 @@
                         </div>
 
                         <div class="djob-section-title">Job Description</div>
-                        <div class="djob-desc">
-                            We are seeking a graphic designer to help us explore creative directions for visual identity and brand assets within a larger branding initiative. This is a short-term opportunity to showcase your unique approach through concept work.
-                        </div>
-                        <div class="djob-desc">
-                            <strong>Project Overview</strong><br>
-                            You will be exploring and iterating graphic design concepts that align with our brand’s values, tone, and user experience. This is a short exploratory engagement to review your approach and see how it could evolve during the final build of branding materials and other visual assets across campaigns.
-                        </div>
+                        <div class="djob-desc">{!! nl2br(e($job->description)) !!}</div>
+                        
+                        @if($job->tag_1 || $job->tag_2 || $job->tag_3 || $job->tag_4)
                         <div class="djob-tags">
-                            <span class="dtag">#remote</span>
-                            <span class="dtag">#design</span>
-                            <span class="dtag">#graphicdesign</span>
-                            <span class="dtag">#activelyreviewing</span>
+                            @if($job->tag_1)<span class="dtag">{{ $job->tag_1 }}</span>@endif
+                            @if($job->tag_2)<span class="dtag">{{ $job->tag_2 }}</span>@endif
+                            @if($job->tag_3)<span class="dtag">{{ $job->tag_3 }}</span>@endif
+                            @if($job->tag_4)<span class="dtag">{{ $job->tag_4 }}</span>@endif
                         </div>
+                        @endif
                     </div>
-
-                    <!-- Card 3 -->
-                    <div class="djob-card">
-                        <div class="djob-header">
-                            <img style="width: 65px; height:65px" src="{{ asset('image/halojasa.png') }}" class="djob-logo" alt="Logo">
-                            <div class="djob-headcol">
-                                <div class="djob-title-row">
-                                    <div class="djob-title">Design Illustrator</div>
-                                    <div class="djob-actions">
-                                        <a href="#" class="djob-apply">+ Apply</a>
-                                        <a href="#" class="djob-more" aria-label="More options">
-                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="#111827"><circle cx="12" cy="9" r="2"/><circle cx="12" cy="15" r="2"/></svg>
-                                        </a>
-                                    </div>
-                                </div>
-                                <div class="djob-subinfo">Indonesia | HaloJasa Indonesia</div>
-                                <div class="djob-meta">
-                                    <span class="djob-meta-item djob-meta-item--green">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
-                                        Actively reviewing applications
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="djob-section-title">Job Description</div>
-                        <div class="djob-desc">
-                            <strong>Do you enjoy working at home or studio?</strong><br>
-                            We offer flexible working hours; most weeks do not require you to come to the office. In fact you can work better from home and manage your own schedule. We’re looking for an effective person for you to be Design Illustrator. Of course because of this work you can work on image design through the internet.
-                        </div>
-                        <div class="djob-desc">
-                            The most important thing from our company are your product works of art with great ideas and full of motivation. Your product images and illustrations will be used for many of our product works. That is, the only one more appreciated from what you have are the Design Illustrator team.
-                        </div>
-                        <div class="djob-tags">
-                            <span class="dtag">#remote</span>
-                            <span class="dtag">#design</span>
-                            <span class="dtag">#graphicdesign</span>
-                            <span class="dtag">#activelyreviewing</span>
-                        </div>
-                    </div>
+                    @endforeach
                 </div>
                 <!-- End Detailed Jobs -->
         </div>
@@ -1278,20 +1227,14 @@
                     {
                         title: 'Best Partner Jobs - Career Opportunities | CloseCall',
                         url: 'closecall.com/bestpartnerjob',
-                        description: 'Explore exciting career opportunities at <span class="search-result-highlight">Best Partner</span> Education. Find your dream job with competitive salaries and excellent benefits.',
+                        description: 'Explore exciting career opportunities at Best Partner Education.',
                         route: '/bestpartnerjob'
-                    },
-                    {
-                        title: 'Best Partner Company Profile | CloseCall',
-                        url: 'closecall.com/bestpartner',
-                        description: 'View the complete company profile of <span class="search-result-highlight">Best Partner</span> Education including company information, culture, and available positions.',
-                        route: '/bestpartner'
                     }
                 ]
             };
             
-            // Search functionality
-            searchInput.addEventListener('input', function() {
+            // Search functionality with dynamic company search
+            searchInput.addEventListener('input', async function() {
                 const query = this.value.toLowerCase().trim();
                 
                 if (query === '') {
@@ -1299,15 +1242,33 @@
                     return;
                 }
                 
-                // Check if query matches any search terms
                 const results = [];
+                
+                // Check hardcoded search terms first
                 for (const [key, items] of Object.entries(searchData)) {
-                    // Show results for any query containing "best" or "partner"
                     if (query.includes('best') || query.includes('partner') || 
                         query.includes('bestpartner') || key.includes(query)) {
                         results.push(...items);
-                        break; // Only add once
+                        break;
                     }
+                }
+                
+                // Search companies dynamically from database
+                try {
+                    const response = await fetch(`/api/companies/search?q=${encodeURIComponent(query)}`);
+                    if (response.ok) {
+                        const companies = await response.json();
+                        companies.forEach(company => {
+                            results.push({
+                                title: company.company_name + ' Company Profile | CloseCall',
+                                url: 'closecall.com/company/' + company.id,
+                                description: `View the complete company profile of ${company.company_name}. ${company.industry} | ${company.company_size} employees.`,
+                                route: '/company/' + company.id
+                            });
+                        });
+                    }
+                } catch (error) {
+                    console.log('Company search error:', error);
                 }
                 
                 if (results.length > 0) {
@@ -1361,6 +1322,114 @@
                 e.stopPropagation();
             });
         }
+
+        // Jobs Search and Filter Functionality
+        const jobSearchInput = document.getElementById('jobSearchInput');
+        const jobCards = document.querySelectorAll('.djob-card');
+        const tagButtons = document.querySelectorAll('.tag');
+
+        // Function to filter jobs
+        function filterJobs(searchTerm) {
+            const isHashtagSearch = searchTerm.startsWith('#');
+            const cleanTerm = searchTerm.toLowerCase();
+
+            jobCards.forEach(card => {
+                const jobTitle = card.querySelector('.djob-title')?.textContent.toLowerCase() || '';
+                const jobTagElements = card.querySelectorAll('.dtag');
+                const jobTags = Array.from(jobTagElements).map(tag => tag.textContent.toLowerCase().trim());
+
+                let shouldShow = false;
+
+                if (searchTerm === '') {
+                    // Show all jobs when search is empty
+                    shouldShow = true;
+                } else if (isHashtagSearch) {
+                    // Filter by hashtag - remove # from search and compare
+                    const searchTag = cleanTerm.replace(/\s+/g, ''); // Remove spaces
+                    shouldShow = jobTags.some(tag => {
+                        const cleanTag = tag.replace(/\s+/g, ''); // Remove spaces from tag
+                        return cleanTag === searchTag || cleanTag.includes(searchTag);
+                    });
+                } else {
+                    // Search by job title
+                    shouldShow = jobTitle.includes(cleanTerm);
+                }
+
+                card.style.display = shouldShow ? '' : 'none';
+            });
+        }
+
+        // Search input event listener
+        if (jobSearchInput) {
+            jobSearchInput.addEventListener('input', function(e) {
+                filterJobs(e.target.value);
+            });
+        }
+
+        // Tag button click handlers
+        tagButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const tagText = this.textContent.trim().toLowerCase();
+                // Convert tag name to hashtag format
+                const hashtagSearch = '#' + tagText.replace(/\s+/g, '');
+                
+                // Set the search input value
+                if (jobSearchInput) {
+                    jobSearchInput.value = hashtagSearch;
+                    filterJobs(hashtagSearch);
+                }
+            });
+        });
+
+        // ============ AJAX DELETE FUNCTIONALITY ============
+        
+        // Handle delete button clicks in Open Jobs section
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('delete-job-btn') || e.target.closest('.delete-job-btn')) {
+                e.preventDefault();
+                const btn = e.target.classList.contains('delete-job-btn') ? e.target : e.target.closest('.delete-job-btn');
+                const jobId = btn.getAttribute('data-job-id');
+                const jobCard = btn.closest('.job-card');
+                
+                if (jobId && jobCard) {
+                    deleteJob(jobId, jobCard);
+                }
+            }
+            
+            // Handle delete button clicks in Detailed Jobs section
+            if (e.target.classList.contains('delete-detailed-job-btn') || e.target.closest('.delete-detailed-job-btn')) {
+                e.preventDefault();
+                const btn = e.target.classList.contains('delete-detailed-job-btn') ? e.target : e.target.closest('.delete-detailed-job-btn');
+                const jobId = btn.getAttribute('data-job-id');
+                const jobCard = btn.closest('.djob-card');
+                
+                if (jobId && jobCard) {
+                    deleteJob(jobId, jobCard, true); // true = detailed job
+                }
+            }
+        });
+        
+        // Function to delete job via AJAX (ANIMATION ONLY - NO DATABASE DELETE)
+        function deleteJob(jobId, jobCard, isDetailed = false) {
+            // Add hiding class for animation
+            jobCard.classList.add('hiding');
+            
+            // Animate removal without deleting from database
+            setTimeout(() => {
+                jobCard.style.maxHeight = '0';
+                jobCard.style.marginBottom = '0';
+                jobCard.style.padding = '0';
+                jobCard.style.opacity = '0';
+                
+                // Fully remove from DOM after transition (visual only)
+                setTimeout(() => {
+                    jobCard.remove();
+                    console.log('Job hidden (not deleted from database):', jobId);
+                }, 300);
+            }, 300);
+        }
+    
     </script>
 </body>
 </html>
+```

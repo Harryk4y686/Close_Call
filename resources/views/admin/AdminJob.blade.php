@@ -321,17 +321,20 @@
         <div class="sidebar-logo">
             <img src="{{ asset('image/logo.png') }}" alt="CloseCall Logo" class="logo-img">
         </div>
-        <a href="{{ route('profile') }}" class="sidebar-icon active" data-page="home">
+        <a href="{{ route('AdminDashboard') }}" class="sidebar-icon" data-page="home">
             <img src="{{ asset('image/home.png') }}" alt="Home" class="sidebar-icon-img">
         </a>
-        <a href="{{ route('jobs') }}" class="sidebar-icon" data-page="jobs">
+        <a href="{{ route('AdminUserDatabase') }}" class="sidebar-icon" data-page="users">
+            <img src="{{ asset('image/users.png') }}" alt="Users" class="sidebar-icon-img">
+        </a>
+        <a href="{{ route('AdminJobDatabase') }}" class="sidebar-icon active" data-page="jobs">
             <img src="{{ asset('image/jobs.png') }}" alt="Jobs" class="sidebar-icon-img">
         </a>
-        <a href="{{ route('events') }}" class="sidebar-icon" data-page="events">
+        <a href="{{ route('AdminEventDatabase') }}" class="sidebar-icon" data-page="events">
             <img src="{{ asset('image/events.png') }}" alt="Events" class="sidebar-icon-img">
         </a>
-        <a href="{{ route('AI') }}" class="sidebar-icon" data-page="AI">
-            <img src="{{ asset('image/genius.png') }}" alt="AI" class="sidebar-icon-img">
+        <a href="{{ route('AdminCompanyDatabase') }}" class="sidebar-icon" data-page="companies">
+            <img src="{{ asset('image/company.png') }}" alt="Companies" class="sidebar-icon-img">
         </a>
     </div>
 
@@ -374,25 +377,28 @@
                     </div>
                 </div>
 
+                <form action="{{ route('adminjobadd.store') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+
                 <div class="add-job-card">
                     <!-- Add Job Section -->
                     <h2 class="section-title">Add Job</h2>
                     <div class="form-grid">
                         <div class="form-group">
                             <label><b>Name</b></label>
-                            <input type="text" placeholder="User1">
+                            <input type="text" name="job_name" placeholder="Job Title" required>
                         </div>
                         <div class="form-group">
                             <label><b>Category</b></label>
-                            <input type="text" placeholder="User1">
+                            <input type="text" name="category" placeholder="Category" required>
                         </div>
                         <div class="form-group">
                             <label><b>Company</b></label>
-                            <input type="text" placeholder="Company">
+                            <input type="text" name="company" placeholder="Company" required>
                         </div>
                         <div class="form-group">
                             <label><b>Location</b></label>
-                            <select>
+                            <select name="location" required>
                                 <option value="" disabled selected>Select your country</option>
                                 <option value="Afghanistan">Afghanistan</option>
                                 <option value="Albania">Albania</option>
@@ -593,16 +599,17 @@
                         </div>
                         <div class="form-group full-width">
                             <label><b>Description</b></label>
-                            <input type="text" placeholder="It is amazing">
+                            <input type="text" name="description" placeholder="Job Description" required>
                         </div>
                     <div class="form-group full-width">
                         <label><b>Tags</b></label>
-                        <input type="text" placeholder="'A', 'B', 'C'">
+                        <input type="text" name="tags" placeholder="#tag1 #tag2 #tag3">
                     </div>
                     </div>
                 </div>
 
-                <button class="save-btn">Add</button>
+                <button type="submit" class="save-btn">Add</button>
+                </form>
                 </div>
             </div>
         </div>
@@ -612,45 +619,13 @@
         // Add smooth scrolling behavior
         document.documentElement.style.scrollBehavior = 'smooth';
 
-        // Handle save button
-        document.querySelector('.save-btn').addEventListener('click', function() {
-            this.textContent = 'Adding...';
-            this.disabled = true;
-            
-            setTimeout(() => {
-                this.textContent = 'Added!';
-                this.style.background = '#10b981';
-                
-                setTimeout(() => {
-                    this.textContent = 'Add';
-                    this.disabled = false;
-                    this.style.background = '#00A88F';
-                }, 2000);
-            }, 1500);
-        });
-
-        // Handle sidebar navigation
-        document.querySelectorAll('.sidebar-icon').forEach(icon => {
-            icon.addEventListener('click', function(e) {
-                const href = this.getAttribute('href');
-                
-                // Only prevent default if href is "#" (placeholder)
-                if (href === '#') {
-                    e.preventDefault();
-                    console.log('Navigation placeholder - add route for:', this.getAttribute('data-page'));
-                }
-                
-                // Update active state
-                document.querySelectorAll('.sidebar-icon').forEach(i => i.classList.remove('active'));
-                this.classList.add('active');
-            });
-        });
-
-        // Handle Edit Profile button
-        document.querySelector('.btn-edit').addEventListener('click', function() {
+        // Handle Edit Profile button (for profile_picture)
+        document.querySelectorAll('.btn-edit')[0].addEventListener('click', function() {
             const input = document.createElement('input');
             input.type = 'file';
+            input.name = 'profile_picture';  // CRITICAL: Add name attribute
             input.accept = 'image/*';
+            input.style.display = 'none';
             
             input.addEventListener('change', function(e) {
                 if (e.target.files.length > 0) {
@@ -663,17 +638,27 @@
                     };
                     
                     reader.readAsDataURL(file);
+                    
+                    // CRITICAL: Add the file input to the form
+                    const form = document.querySelector('form');
+                    const existingInput = form.querySelector('input[name="profile_picture"]');
+                    if (existingInput && existingInput !== input) {
+                        existingInput.remove();
+                    }
+                    form.appendChild(input);
                 }
             });
             
             input.click();
         });
 
-        // Handle Edit Banner button
+        // Handle Edit Banner button (for banner_image)
         document.querySelectorAll('.btn-edit')[1].addEventListener('click', function() {
             const input = document.createElement('input');
             input.type = 'file';
+            input.name = 'banner_image';  // CRITICAL: Add name attribute
             input.accept = 'image/*';
+            input.style.display = 'none';
             
             input.addEventListener('change', function(e) {
                 if (e.target.files.length > 0) {
@@ -682,17 +667,37 @@
                     
                     reader.onload = function(e) {
                         const profileHeader = document.querySelector('.profile-header');
-                        profileHeader.style.background = `url(${e.target.result})`;
+                        profileHeader.style.backgroundImage = `url(${e.target.result})`;
                         profileHeader.style.backgroundSize = 'cover';
                         profileHeader.style.backgroundPosition = 'center';
                         profileHeader.style.backgroundRepeat = 'no-repeat';
                     };
                     
                     reader.readAsDataURL(file);
+                    
+                    // CRITICAL: Add the file input to the form
+                    const form = document.querySelector('form');
+                    const existingInput = form.querySelector('input[name="banner_image"]');
+                    if (existingInput && existingInput !== input) {
+                        existingInput.remove();
+                    }
+                    form.appendChild(input);
                 }
             });
             
             input.click();
+        });
+
+        // Handle sidebar navigation
+        document.querySelectorAll('.sidebar-icon').forEach(icon => {
+            icon.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                if (href === '#') {
+                    e.preventDefault();
+                }
+                document.querySelectorAll('.sidebar-icon').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
         });
     </script>
 </body>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile - CloseCall</title>
+    <title>Admin - Event Edit</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @keyframes slideInSoft {
@@ -292,21 +292,24 @@
 </head>
 <body>
     <!-- Left Sidebar -->
-    <div class="sidebar">
+     <div class="sidebar">
         <div class="sidebar-logo">
             <img src="{{ asset('image/logo.png') }}" alt="CloseCall Logo" class="logo-img">
         </div>
-        <a href="{{ route('profile') }}" class="sidebar-icon active" data-page="home">
+        <a href="{{ route('AdminDashboard') }}" class="sidebar-icon" data-page="home">
             <img src="{{ asset('image/home.png') }}" alt="Home" class="sidebar-icon-img">
         </a>
-        <a href="{{ route('jobs') }}" class="sidebar-icon" data-page="jobs">
+        <a href="{{ route('AdminUserDatabase') }}" class="sidebar-icon" data-page="users">
+            <img src="{{ asset('image/users.png') }}" alt="Users" class="sidebar-icon-img">
+        </a>
+        <a href="{{ route('AdminJobDatabase') }}" class="sidebar-icon" data-page="jobs">
             <img src="{{ asset('image/jobs.png') }}" alt="Jobs" class="sidebar-icon-img">
         </a>
-        <a href="{{ route('events') }}" class="sidebar-icon" data-page="events">
+        <a href="{{ route('AdminEventDatabase') }}" class="sidebar-icon active" data-page="events">
             <img src="{{ asset('image/events.png') }}" alt="Events" class="sidebar-icon-img">
         </a>
-        <a href="{{ route('AI') }}" class="sidebar-icon" data-page="AI">
-            <img src="{{ asset('image/genius.png') }}" alt="AI" class="sidebar-icon-img">
+        <a href="{{ route('AdminCompanyDatabase') }}" class="sidebar-icon" data-page="companies">
+            <img src="{{ asset('image/company.png') }}" alt="Companies" class="sidebar-icon-img">
         </a>
     </div>
 
@@ -314,62 +317,51 @@
     <div class="main-content">
         <!-- Header -->
         <div class="header">
-            <div class="search-bar">
-                <svg width="18" height="18" fill="#6b7280" viewBox="0 0 24 24">
-                    <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-                </svg>
-                <input type="text" placeholder="Search...">
-            </div>
-            <a href="#" class="notification-icon">
-                <svg width="18" height="18" fill="#6b7280" viewBox="0 0 24 24">
-                    <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
-                </svg>
-            </a>
-            <a href="{{ route('profile') }}" class="avatar-icon">
-                <svg width="18" height="18" fill="#6b7280" viewBox="0 0 24 24">
-                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                </svg>
-            </a>
         </div>
 
         <!-- Content Wrapper -->
         <div class="content-wrapper">
             <!-- Main Section -->
             <div class="main-section">
-                <div class="profile-header">
+                <div class="profile-header" style="background-image: url('{{ $event->banner_image ? asset('storage/' . $event->banner_image) : asset('image/defaultbanner.png') }}');">
                     <div class="profile-buttons">
-                        <button class="btn-edit">Edit Banner</button>
+                        <button type="button" class="btn-edit">Edit Banner</button>
                     </div>
                 </div>
+
+                <form action="{{ route('admineventedit.update', $event->id) }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT')
 
                 <div class="add-job-card">
                     <!-- Add Event Section -->
-                    <h2 class="section-title">Add Event</h2>
+                    <h2 class="section-title">Edit Event</h2>
                     <div class="form-grid">
                         <div class="form-group">
                             <label><b>Event Name</b></label>
-                            <input type="text" placeholder="Event">
+                            <input type="text" name="event_name" value="{{ $event->event_name }}" required>
                         </div>
                         <div class="form-group">
                             <label><b>Starting Date</b></label>
-                            <input type="date">
+                            <input type="date" name="starting_date" value="{{ \Carbon\Carbon::parse($event->starting_date)->format('Y-m-d') }}" required>
                         </div>
                         <div class="form-group">
                             <label><b>Location</b></label>
-                            <input type="text" placeholder="Jl. Location">
+                            <input type="text" name="location" value="{{ $event->location }}" required>
                         </div>
                         <div class="form-group">
                             <label><b>Attendees</b></label>
-                            <input type="number" placeholder="0" min="0">
+                            <input type="number" name="attendees" value="{{ $event->attendees }}" min="0" required>
                         </div>
                         <div class="form-group full-width">
                             <label><b>About</b></label>
-                            <textarea rows="3" placeholder="It is amazing."></textarea>
+                            <textarea name="about" rows="3" required>{{ $event->about }}</textarea>
                         </div>
                     </div>
                 </div>
 
-                <button class="save-btn">Save</button>
+                <button type="submit" class="save-btn">Save</button>
+                </form>
                 </div>
             </div>
         </div>
@@ -379,22 +371,7 @@
         // Add smooth scrolling behavior
         document.documentElement.style.scrollBehavior = 'smooth';
 
-        // Handle save button
-        document.querySelector('.save-btn').addEventListener('click', function() {
-            this.textContent = 'Adding...';
-            this.disabled = true;
-            
-            setTimeout(() => {
-                this.textContent = 'Added!';
-                this.style.background = '#10b981';
-                
-                setTimeout(() => {
-                    this.textContent = 'Add';
-                    this.disabled = false;
-                    this.style.background = '#00A88F';
-                }, 2000);
-            }, 1500);
-        });
+        // Removed save button handler to allow normal form submission
 
         // Handle sidebar navigation
         document.querySelectorAll('.sidebar-icon').forEach(icon => {
@@ -417,7 +394,9 @@
         document.querySelector('.btn-edit').addEventListener('click', function() {
             const input = document.createElement('input');
             input.type = 'file';
+            input.name = 'banner_image';
             input.accept = 'image/*';
+            input.style.display = 'none';
             
             input.addEventListener('change', function(e) {
                 if (e.target.files.length > 0) {
@@ -433,6 +412,14 @@
                     };
                     
                     reader.readAsDataURL(file);
+                    
+                    // Add input to form
+                    const form = document.querySelector('form');
+                    const existingInput = form.querySelector('input[name="banner_image"]');
+                    if (existingInput && existingInput !== input) {
+                        existingInput.remove();
+                    }
+                    form.appendChild(input);
                 }
             });
             
@@ -442,3 +429,4 @@
     </script>
 </body>
 </html>
+

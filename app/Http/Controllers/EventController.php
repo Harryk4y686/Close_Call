@@ -51,10 +51,13 @@ class EventController extends Controller
             ->upcoming()
             ->get();
         
+        // Get admin events for recommended section
+        $adminEvents = \App\Models\AdminEvent::latest()->get();
+        
         // Get user profile for header display
         $profile = $user->registeredProfile;
         
-        return view('events', compact('myEvents', 'recommendedEvents', 'upcomingEvents', 'user', 'profile'));
+        return view('events', compact('myEvents', 'recommendedEvents', 'upcomingEvents', 'adminEvents', 'user', 'profile'));
     }
 
     /**
@@ -195,7 +198,7 @@ class EventController extends Controller
         $user = $this->getAuthUser();
         $event = Event::where('user_id', $user->id)->findOrFail($id);
         $profile = $user->registeredProfile;
-        return view('createevent', compact('event', 'user', 'profile'));
+        return view('editevents', compact('event', 'user', 'profile'));
     }
 
     /**

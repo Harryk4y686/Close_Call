@@ -174,7 +174,7 @@
                 <input type="password" name="password" placeholder="Password" class="input-field" required>
 
                 <div class="flex justify-end text-sm">
-                    <a href="" class="text-gray-600 hover:text-cyan-700">
+                    <a href="{{ route('password.request') }}" class="text-gray-600 hover:text-cyan-700">
                         Forgot your password?
                     </a>
                 </div>

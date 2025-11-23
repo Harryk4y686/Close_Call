@@ -4,7 +4,209 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile - CloseCall</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+<script>
+    // Tab switching functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const tabs = document.querySelectorAll('.nav-tab');
+        const contentSections = document.querySelector('.content-sections');
+        const locationsSection = null; // locations merged into Headquarters
+        const activeJobsSection = document.querySelector('.active-jobs-section');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Remove active class from all tabs
+                tabs.forEach(t => t.classList.remove('active'));
+                
+                // Add active class to clicked tab
+                this.classList.add('active');
+                
+                // Show/hide content based on active tab with immediate animation
+                if (this.textContent.trim() === 'About') {
+                    // Hide active jobs section immediately
+                    if (activeJobsSection) {
+                        activeJobsSection.style.display = 'none';
+                        activeJobsSection.style.opacity = '0';
+                        activeJobsSection.style.transform = 'translateY(30px)';
+                    }
+                    
+                    // Show about sections with immediate animation
+                    setTimeout(() => {
+                        contentSections.style.display = 'block';
+                        
+                        // Reset and animate about sections
+                        contentSections.style.opacity = '0';
+                        contentSections.style.transform = 'translateY(20px)';
+                        
+                        // Animate in
+                        setTimeout(() => {
+                            contentSections.style.transition = 'all 0.5s ease-out';
+                            contentSections.style.opacity = '1';
+                            contentSections.style.transform = 'translateY(0)';
+                            
+                            // locations section removed
+                        }, 50);
+                    }, 10);
+                    
+                } else if (this.textContent.trim() === 'Active Jobs') {
+                    // Hide about sections immediately
+                    contentSections.style.display = 'none';
+                    contentSections.style.opacity = '0';
+                    contentSections.style.transform = 'translateY(30px)';
+                    
+                    // Show active jobs section with immediate animation
+                    setTimeout(() => {
+                        if (activeJobsSection) {
+                            activeJobsSection.style.display = 'block';
+                            activeJobsSection.style.opacity = '0';
+                            activeJobsSection.style.transform = 'translateY(20px)';
+                            
+                            // Animate in
+                            setTimeout(() => {
+                                activeJobsSection.style.transition = 'all 0.5s ease-out';
+                                activeJobsSection.style.opacity = '1';
+                                activeJobsSection.style.transform = 'translateY(0)';
+                            }, 50);
+                        }
+                    }, 10);
+                }
+            });
+        });
+
+        // Smooth staggered animation system
+        function animateElementsStaggered() {
+            const elements = document.querySelectorAll('.animate-fadeInUp, .animate-fadeInLeft, .animate-fadeInRight, .animate-scaleIn');
+            
+            elements.forEach((el, index) => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(20px)';
+                el.style.transition = 'none';
+                
+                setTimeout(() => {
+                    el.style.transition = 'all 0.6s ease-out';
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }, index * 100); // Stagger by 100ms each
+            });
+        }
+
+        // Initialize smooth animations on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Wait a bit for page to settle, then animate
+            setTimeout(animateElementsStaggered, 100);
+        });
+
+        // Add parallax effect to job header
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const jobHeader = document.querySelector('.job-header');
+            if (jobHeader) {
+                jobHeader.style.transform = `translateY(${scrolled * 0.3}px)`;
+            }
+        });
+
+
+        // Add ripple effect to buttons
+        function createRipple(event) {
+            const button = event.currentTarget;
+            const circle = document.createElement('span');
+            const diameter = Math.max(button.clientWidth, button.clientHeight);
+            const radius = diameter / 2;
+
+            circle.style.width = circle.style.height = `${diameter}px`;
+            circle.style.left = `${event.clientX - button.offsetLeft - radius}px`;
+            circle.style.top = `${event.clientY - button.offsetTop - radius}px`;
+            circle.classList.add('ripple');
+
+            const ripple = button.getElementsByClassName('ripple')[0];
+            if (ripple) {
+                ripple.remove();
+            }
+
+            button.appendChild(circle);
+        }
+
+        // Add ripple effect to all interactive elements
+        document.querySelectorAll('.nav-tab, .djob-apply, .djob-more, .dtag, .get-directions').forEach(element => {
+            element.addEventListener('click', createRipple);
+        });
+
+        // Add CSS for ripple effect
+        const style = document.createElement('style');
+        style.textContent = `
+            .ripple {
+                position: absolute;
+                border-radius: 50%;
+                background-color: rgba(0, 168, 143, 0.3);
+                transform: scale(0);
+                animation: ripple-animation 0.6s linear;
+                pointer-events: none;
+            }
+            
+            @keyframes ripple-animation {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Add smooth scroll for page load
+        window.addEventListener('load', function() {
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        });
+
+        // Add hover effects to map container
+        const mapContainer = document.querySelector('.map-container');
+        if (mapContainer) {
+            mapContainer.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.02)';
+                this.style.transition = 'transform 0.3s ease';
+            });
+            
+            mapContainer.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+            });
+        }
+
+        // Add pulse animation to company logo on hover
+        const companyLogo = document.querySelector('.company-logo');
+        if (companyLogo) {
+            companyLogo.addEventListener('mouseenter', function() {
+                this.style.animation = 'pulse 1s infinite';
+            });
+            
+            companyLogo.addEventListener('mouseleave', function() {
+                this.style.animation = 'float 3s ease-in-out infinite';
+            });
+        }
+
+        // Function to reset and animate elements immediately
+        function animateElementImmediate(element, delay = 0) {
+            if (!element) return;
+            
+            setTimeout(() => {
+                element.style.opacity = '0';
+                element.style.transform = 'translateY(20px)';
+                element.style.transition = 'none';
+                
+                setTimeout(() => {
+                    element.style.transition = 'all 0.5s ease-out';
+                    element.style.opacity = '1';
+                    element.style.transform = 'translateY(0)';
+                }, 10);
+            }, delay);
+        }
+
+        // Function to hide elements immediately
+        function hideElementImmediate(element) {
+            if (!element) return;
+            element.style.opacity = '0';
+            element.style.transform = 'translateY(30px)';
+            element.style.transition = 'all 0.3s ease-out';
+        }
+    });
+</script>
     <style>
         body {
             font-family: 'Poppins', sans-serif;
@@ -1232,7 +1434,7 @@
         <a href="{{ route('landing-page') }}" class="sidebar-logo">
             <img src="{{ asset('image/logo.png') }}" alt="CloseCall Logo" class="logo-img">
         </a>
-        <a href="{{ route('profile') }}" class="sidebar-icon active" data-page="home">
+        <a href="{{ route('landing-page') }}" class="sidebar-icon active" data-page="home">
             <img src="{{ asset('image/home.png') }}" alt="Home" class="sidebar-icon-img">
         </a>
         <a href="{{ route('jobs') }}" class="sidebar-icon" data-page="jobs">
@@ -1242,7 +1444,7 @@
             <img src="{{ asset('image/events.png') }}" alt="Events" class="sidebar-icon-img">
         </a>
         <a href="{{ route('chats') }}" class="sidebar-icon" data-page="AI">
-            <img src="{{ asset('image/genius.png') }}" alt="AI" class="sidebar-icon-img">
+            <img src="{{ asset('image/chats.png') }}" alt="Chats" class="sidebar-icon-img">
         </a>
     </div>
 

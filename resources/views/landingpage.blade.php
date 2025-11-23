@@ -1126,7 +1126,7 @@
                             Actively reviewing applications
                         </div>
                     </div>
-                    <a href="#" class="job-apply-btn">+</a>
+                    <a href="{{ route('register') }}" class="job-apply-btn">+</a>
                 </div>
                 
                 <div class="job-card scroll-animate scroll-animate-left delay-200">
@@ -1139,7 +1139,7 @@
                             Actively reviewing applications
                         </div>
                     </div>
-                    <a href="#" class="job-apply-btn">+</a>
+                    <a href="{{ route('register') }}" class="job-apply-btn">+</a>
                 </div>
                 
                 <div class="job-card scroll-animate scroll-animate-right delay-300">
@@ -1152,7 +1152,7 @@
                             Actively reviewing applications
                         </div>
                     </div>
-                    <a href="#" class="job-apply-btn">+</a>
+                    <a href="{{ route('register') }}" class="job-apply-btn">+</a>
                 </div>
                 
                 <div class="job-card scroll-animate scroll-animate-left delay-400">
@@ -1165,7 +1165,7 @@
                             Actively reviewing applications
                         </div>
                     </div>
-                    <a href="#" class="job-apply-btn">+</a>
+                    <a href="{{ route('register') }}" class="job-apply-btn">+</a>
                 </div>
                 
                 <div class="job-card scroll-animate scroll-animate-right delay-500">
@@ -1178,7 +1178,7 @@
                             Actively reviewing applications
                         </div>
                     </div>
-                    <a href="#" class="job-apply-btn">+</a>
+                    <a href="{{ route('register') }}" class="job-apply-btn">+</a>
                 </div>
             </div>
             
@@ -1267,7 +1267,7 @@
             
             <div class="cta-buttons">
                 <a href="/register" class="cta-button scroll-animate scroll-animate-up delay-400">Register</a>
-                <a href="#" class="cta-button secondary scroll-animate scroll-animate-up delay-500">Login</a>
+                <a href="/login" class="cta-button secondary scroll-animate scroll-animate-up delay-500">Login</a>
             </div>
         </div>
     </section>

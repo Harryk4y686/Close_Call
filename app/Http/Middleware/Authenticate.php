@@ -13,8 +13,10 @@ class Authenticate extends Middleware
      */
     public function handle($request, Closure $next, ...$guards)
     {
-        // Check if user is authenticated in any guard
-        if (auth()->guard('web')->check() || auth()->guard('pengguna')->check()) {
+        // Check if user is authenticated in any guard (including admin_user)
+        if (auth()->guard('web')->check() || 
+            auth()->guard('pengguna')->check() || 
+            auth()->guard('admin_user')->check()) {
             return $next($request);
         }
 

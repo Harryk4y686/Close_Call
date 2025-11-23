@@ -44,6 +44,10 @@ return [
             'driver' => 'session',
             'provider' => 'pengguna',
         ],
+        'admin_user' => [
+            'driver' => 'session',
+            'provider' => 'admin_users',
+        ],
     ],
 
     /*
@@ -71,6 +75,10 @@ return [
         'pengguna' => [
             'driver' => 'eloquent',
             'model' => App\Models\Pengguna::class,
+        ],
+        'admin_users' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\AdminUser::class,
         ],
 
         // 'users' => [

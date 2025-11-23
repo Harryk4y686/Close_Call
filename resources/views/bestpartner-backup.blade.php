@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Best Partner Jobs - CloseCall</title>
+    <title>{{ $company->company_name }} - CloseCall</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -953,17 +953,17 @@
         <a href="{{ route('landing-page') }}" class="sidebar-logo">
             <img src="{{ asset('image/logo.png') }}" alt="CloseCall Logo" class="logo-img">
         </a>
-        <a href="{{ route('profile') }}" class="sidebar-icon" data-page="home">
+        <a href="{{ route('landing-page') }}" class="sidebar-icon" data-page="home">
             <img src="{{ asset('image/home.png') }}" alt="Home" class="sidebar-icon-img">
         </a>
-        <a href="{{ route('jobs') }}" class="sidebar-icon" data-page="jobs">
+        <a href="{{ route('jobs') }}" class="sidebar-icon active" data-page="jobs">
             <img src="{{ asset('image/jobs.png') }}" alt="Jobs" class="sidebar-icon-img">
         </a>
         <a href="{{ route('events') }}" class="sidebar-icon" data-page="events">
             <img src="{{ asset('image/events.png') }}" alt="Events" class="sidebar-icon-img">
         </a>
-        <a href="{{ route('chats') }}" class="sidebar-icon" data-page="AI">
-            <img src="{{ asset('image/genius.png') }}" alt="AI" class="sidebar-icon-img">
+        <a href="{{ route('chats') }}" class="sidebar-icon" data-page="chats">
+            <img src="{{ asset('image/chats.png') }}" alt="Chats" class="sidebar-icon-img">
         </a>
     </div>
 
@@ -978,12 +978,13 @@
                 Indonesia
             </div>
             
-            <div class="search-bar animate-fadeInUp delay-300">
+            
+            <form action="{{ route('search') }}" method="GET" class="search-bar animate-fadeInUp delay-300">
                 <svg width="18" height="18" fill="#6b7280" viewBox="0 0 24 24">
                     <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
                 </svg>
-                <input type="text" placeholder="Title, skill, or company...">
-            </div>
+                <input type="text" name="q" placeholder="Title, skill, or company...">
+            </form>
 
             <a href="#" class="notification-icon animate-fadeInRight delay-400">
                 <svg width="18" height="18" fill="#6b7280" viewBox="0 0 24 24">
@@ -1009,16 +1010,24 @@
         <!-- Content -->
         <div class="content-wrapper">
             <!-- Job Header with Background -->
-            <div class="job-header animate-fadeInUp delay-100"></div>
+            <div class="job-header animate-fadeInUp delay-100" 
+                 @if($company->banner_image)
+                 style="background-image: url('{{ asset('storage/' . $company->banner_image) }}'); background-size: cover; background-position: center;"
+                 @endif
+            ></div>
             
             <!-- Job Company Info -->
             <div class="job-company-info animate-scaleIn delay-200">
                 <div class="company-header">
                     <div class="company-left">
-                        <img src="{{ asset('image/socialmediamanager.png') }}" alt="Best Partner Education" class="company-logo animate-float">
+                        @if($company->profile_picture)
+                            <img src="{{ asset('storage/' . $company->profile_picture) }}" alt="{{ $company->company_name }}" class="company-logo animate-float">
+                        @else
+                            <img src="{{ asset('image/socialmediamanager.png') }}" alt="{{ $company->company_name }}" class="company-logo animate-float">
+                        @endif
                         <div class="company-details animate-fadeInLeft delay-300">
-                            <h3 style="font-size: 24px">Best Partner Education</h3>
-                            <div class="company-location">Indonesia | Best Partner Education</div>
+                            <h3 style="font-size: 24px">{{ $company->company_name }}</h3>
+                            <div class="company-location">{{ $company->location }} | {{ $company->industry }}</div>
                             <div class="company-status">
                                 <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
@@ -1100,15 +1109,19 @@
                 <h3 class="about-company-title">About the Company</h3>
                 
                 <div class="about-header">
-                    <img src="{{ asset('image/socialmediamanager.png') }}" alt="Best Partner Education" class="company-logo" style="width: 65px; height: 65px; margin-top: 0.5px">
+                    @if($company->profile_picture)
+                    <img src="{{ asset('storage/' . $company->profile_picture) }}" alt="{{ $company->company_name }}" class="company-logo" style="width: 65px; height: 65px; margin-top: 0.5px">
+                @else
+                    <img src="{{ asset('image/socialmediamanager.png') }}" alt="{{ $company->company_name }}" class="company-logo" style="width: 65px; height: 65px; margin-top: 0.5px">
+                @endif
                     <div>
-                        <h4>Best Partner Education</h4>
-                        <div class="company-stats">37,000 followers<br>Education, International Studies | 50-100 employees | 349 on CloseCall</div>
+                        <h4>{{ $company->company_name }}</h4>
+                        <div class="company-stats">{{ $company->industry }} | {{ $company->company_size }} employees | {{ $company->closecall_employees }} on CloseCall</div>
                     </div>
                 </div>
                 
                 <div class="company-description">
-                    Best Partner is revolutionizing hiring with the world's first and only end-to-end AI recruiting platform. Trained with human insights and proprietary data, this reduces time to hire from months to days, instantly matching you with pre-vetted qualified candidates, and conducting the first round phone screen for you. Trusted by hundreds of Fortune 1000 enterprises including Nestlé, Porsche, Atlassian, Goldman Sachs, and Nike, Braintrust AIR is making talent acquisition professionals 10x more effective and saving companies hundreds of thousands of dollars in recruiting costs.
+                    {{ $company->about }}
                 </div>
                 
                 <div class="description-footer">

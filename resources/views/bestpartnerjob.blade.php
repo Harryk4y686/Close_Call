@@ -4,7 +4,169 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Best Partner Jobs - CloseCall</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Handle sidebar navigation - copied from jobs.blade.php
+        document.querySelectorAll('.sidebar-icon').forEach(icon => {
+            icon.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                
+                // Only prevent default if href is "#" (placeholder)
+                if (href === '#') {
+                    e.preventDefault();
+                    console.log('Navigation placeholder - add route for:', this.getAttribute('data-page'));
+                }
+                
+                // Update active state
+                document.querySelectorAll('.sidebar-icon').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Handle Apply button
+        document.querySelector('.apply-btn').addEventListener('click', function() {
+            this.textContent = 'Applied!';
+            this.style.background = '#10b981';
+            this.disabled = true;
+            
+            setTimeout(() => {
+                this.textContent = 'Apply';
+                this.style.background = '#00A88F';
+                this.disabled = false;
+            }, 3000);
+        });
+
+        // Handle Options button
+        document.querySelector('.options-btn').addEventListener('click', function() {
+            // TODO: Add dropdown menu or modal
+            console.log('Options button clicked');
+            // Example: show dropdown with Save Job, Share, Report, etc.
+            alert('Options menu would appear here (Save Job, Share, Report, etc.)');
+        });
+
+        // Handle Show More link - Navigate to aboutbestpartner page
+        document.querySelector('.show-more').addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Navigate to the aboutbestpartner page
+            window.location.href = "{{ route('aboutbestpartner') }}";
+        });
+
+        // Handle Related Job Apply Icons
+        document.querySelectorAll('.apply-icon').forEach(icon => {
+            icon.addEventListener('click', function() {
+                this.textContent = '✓';
+                this.style.background = '#10b981';
+                
+                setTimeout(() => {
+                    this.textContent = '×';
+                    this.style.background = '#00A88F';
+                }, 2000);
+            });
+        });
+
+        // Handle Related Job Cards Click
+        document.querySelectorAll('.related-job-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                // Don't trigger if clicking the apply icon
+                if (!e.target.closest('.apply-icon')) {
+                    console.log('Navigate to job:', this.querySelector('.related-job-title').textContent);
+                    // Here you can add navigation logic
+                }
+            });
+        });
+
+        // Handle Tag clicks
+        document.querySelectorAll('.tag').forEach(tag => {
+            tag.addEventListener('click', function() {
+                console.log('Search for tag:', this.textContent);
+                // Here you can add search functionality
+            });
+        });
+
+        // Smooth scroll for page load
+        window.addEventListener('load', function() {
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        });
+
+        // Intersection Observer for scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe elements for scroll animations
+        document.querySelectorAll('.animate-fadeInUp, .animate-fadeInLeft, .animate-fadeInRight, .animate-scaleIn').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            observer.observe(el);
+        });
+
+        // Add parallax effect to job header
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const jobHeader = document.querySelector('.job-header');
+            if (jobHeader) {
+                jobHeader.style.transform = `translateY(${scrolled * 0.5}px)`;
+            }
+        });
+
+
+
+        // Add ripple effect to buttons
+        function createRipple(event) {
+            const button = event.currentTarget;
+            const circle = document.createElement('span');
+            const diameter = Math.max(button.clientWidth, button.clientHeight);
+            const radius = diameter / 2;
+
+            circle.style.width = circle.style.height = `${diameter}px`;
+            circle.style.left = `${event.clientX - button.offsetLeft - radius}px`;
+            circle.style.top = `${event.clientY - button.offsetTop - radius}px`;
+            circle.classList.add('ripple');
+
+            const ripple = button.getElementsByClassName('ripple')[0];
+            if (ripple) {
+                ripple.remove();
+            }
+
+            button.appendChild(circle);
+        }
+
+        // Add ripple effect to all buttons
+        document.querySelectorAll('.apply-btn, .tag, .apply-icon').forEach(button => {
+            button.addEventListener('click', createRipple);
+        });
+
+        // Add CSS for ripple effect
+        const style = document.createElement('style');
+        style.textContent = `
+            .ripple {
+                position: absolute;
+                border-radius: 50%;
+                background-color: rgba(255, 255, 255, 0.6);
+                transform: scale(0);
+                animation: ripple-animation 0.6s linear;
+                pointer-events: none;
+            }
+            
+            @keyframes ripple-animation {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -670,17 +832,17 @@
         <a href="{{ route('landing-page') }}" class="sidebar-logo">
             <img src="{{ asset('image/logo.png') }}" alt="CloseCall Logo" class="logo-img">
         </a>
-        <a href="{{ route('profile') }}" class="sidebar-icon" data-page="home">
+        <a href="{{ route('landing-page') }}" class="sidebar-icon" data-page="home">
             <img src="{{ asset('image/home.png') }}" alt="Home" class="sidebar-icon-img">
         </a>
-        <a href="{{ route('jobs') }}" class="sidebar-icon" data-page="jobs">
+        <a href="{{ route('landing-page') }}" class="sidebar-icon" data-page="home">
             <img src="{{ asset('image/jobs.png') }}" alt="Jobs" class="sidebar-icon-img">
         </a>
         <a href="{{ route('events') }}" class="sidebar-icon" data-page="events">
             <img src="{{ asset('image/events.png') }}" alt="Events" class="sidebar-icon-img">
         </a>
         <a href="{{ route('chats') }}" class="sidebar-icon" data-page="AI">
-            <img src="{{ asset('image/genius.png') }}" alt="AI" class="sidebar-icon-img">
+            <img src="{{ asset('image/chats.png') }}" alt="Chats" class="sidebar-icon-img">
         </a>
     </div>
 

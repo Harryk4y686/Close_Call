@@ -309,7 +309,7 @@
         <div class="sidebar-logo">
             <img src="{{ asset('image/logo.png') }}" alt="CloseCall Logo" class="logo-img">
         </div>
-        <a href="{{ route('profile') }}" class="sidebar-icon" data-page="home">
+        <a href="{{ route('landing-page') }}" class="sidebar-icon" data-page="home">
             <img src="{{ asset('image/home.png') }}" alt="Home" class="sidebar-icon-img">
         </a>
         <a href="{{ route('jobs') }}" class="sidebar-icon active" data-page="jobs">
@@ -322,7 +322,7 @@
             <img src="{{ asset('image/chats.png') }}" alt="Chats" class="sidebar-icon-img">
         </a>
         <a href="{{ route('AI') }}" class="sidebar-icon" data-page="AI">
-            <img src="{{ asset('image/genius.png') }}" alt="AI" class="sidebar-icon-img">
+            <img src="{{ asset('image/chats.png') }}" alt="Chats" class="sidebar-icon-img">
         </a>
     </div>
 

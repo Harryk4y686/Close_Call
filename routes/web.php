@@ -12,6 +12,8 @@ use App\Http\Controllers\ChatController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\RelationshipTestController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\SearchController;
 use App\Mail\VerifyEmailUser;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
@@ -28,17 +30,19 @@ Route::get('/', function () {
 
 // halaman home/landing page dengan akun (protected route - requires authentication and verification)
 Route::get('/landingpage2', function () {
-    // Get user from either guard
-    $user = Auth::guard('pengguna')->check() ? Auth::guard('pengguna')->user() : Auth::guard('web')->user();
-    $profile = $user->registeredProfile;
+    // Get user from any guard
+    $user = Auth::guard('admin_user')->check() ? Auth::guard('admin_user')->user() : 
+            (Auth::guard('pengguna')->check() ? Auth::guard('pengguna')->user() : 
+            Auth::guard('web')->user());
+    $profile = $user && method_exists($user, 'registeredProfile') ? $user->registeredProfile : null;
     return view('landing-page', compact('user', 'profile'));
-})->middleware(['auth'])->name('landing-page');
+})->middleware(['auth:web,pengguna,admin_user'])->name('landing-page');
 
 // Profile routes (protected - requires authentication and verification for updates)
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth:web,pengguna,admin_user'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
+    Route::get('/edit-profile', [ProfileController::class, 'edit'])->name('edit.profile');
     Route::post('/profile/update', [ProfileController::class, 'update'])
-        ->middleware(\App\Http\Middleware\EnsureEmailIsVerified::class)
         ->name('profile.update');
     Route::get('/profile/completion', [ProfileController::class, 'getCompletionPercentage'])->name('profile.completion');
 });
@@ -50,24 +54,50 @@ Route::get('/complete-profile', function () {
  
 // Jobs page (protected - requires authentication and verification)
 Route::get('/jobs', function () {
-    // Get user from either guard
-    $user = Auth::guard('pengguna')->check() ? Auth::guard('pengguna')->user() : Auth::guard('web')->user();
-    $profile = $user->registeredProfile;
-    return view('jobs', compact('user', 'profile'));
-})->middleware(['auth', \App\Http\Middleware\EnsureEmailIsVerified::class])->name('jobs');
+    // Get user from any guard (admin_user, pengguna, or web)
+    $user = Auth::guard('admin_user')->check() ? Auth::guard('admin_user')->user() : 
+            (Auth::guard('pengguna')->check() ? Auth::guard('pengguna')->user() : 
+            Auth::guard('web')->user());
+    
+    // For admin users, they may not have a registered profile, so make it optional
+    $profile = $user && method_exists($user, 'registeredProfile') ? $user->registeredProfile : null;
+    
+    // Fetch admin jobs - max 3 for open jobs section, all for detailed section
+    $openJobs = \App\Models\AdminJob::latest()->take(3)->get();
+    $detailedJobs = \App\Models\AdminJob::latest()->get();
+    
+    return view('jobs', compact('user', 'profile', 'openJobs', 'detailedJobs'));
+})->middleware(['auth:web,pengguna,admin_user'])->name('jobs');
+
+// Delete job (AJAX)
+Route::delete('/jobs/{id}', function ($id) {
+    $job = \App\Models\AdminJob::findOrFail($id);
+    $job->delete();
+    
+    return response()->json(['success' => true, 'message' => 'Job deleted successfully']);
+})->middleware(['auth:web,pengguna,admin_user'])->name('jobs.delete');
 
 // Jobs Categories page (protected - requires authentication and verification)
 Route::get('/jobs/categories', function () {
     return view('JobsCategories');
-})->middleware(['auth', \App\Http\Middleware\EnsureEmailIsVerified::class])->name('jobs.categories');
+})->middleware(['auth:web,pengguna,admin_user'])->name('jobs.categories');
 
 // Jobs Opened page (protected - requires authentication and verification)
 Route::get('/jobs/opened', function () {
-    return view('JobsOpened');
-})->middleware(['auth', \App\Http\Middleware\EnsureEmailIsVerified::class])->name('jobs.opened');
+    // Get user
+    $user = Auth::guard('admin_user')->check() ? Auth::guard('admin_user')->user() : 
+            (Auth::guard('pengguna')->check() ? Auth::guard('pengguna')->user() : 
+            Auth::guard('web')->user());
+    $profile = $user && method_exists($user, 'registeredProfile') ? $user->registeredProfile : null;
+    
+    // Fetch all admin jobs for display
+    $jobs = \App\Models\AdminJob::latest()->get();
+    
+    return view('JobsOpened', compact('jobs', 'user', 'profile'));
+})->middleware(['auth:web,pengguna,admin_user'])->name('jobs.opened');
  
 // Events routes (protected - requires authentication)
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth:web,pengguna,admin_user'])->group(function () {
     // Main events page
     Route::get('/events', [EventController::class, 'index'])->name('events');
     
@@ -96,10 +126,24 @@ Route::middleware(['auth'])->group(function () {
     
     // Get events by date (AJAX)
     Route::get('/api/events/by-date', [EventController::class, 'getEventsByDate'])->name('events.by.date');
+    
+    // Admin events view (for viewing admin-created events from the events page)
+    Route::get('/admin-events/{id}', [AdminController::class, 'viewAdminEvent'])->name('admin.events.view');
+    Route::post('/admin-events/{id}/attend', [AdminController::class, 'attendAdminEvent'])->name('admin.events.attend');
+    Route::post('/admin-events/{id}/cancel', [AdminController::class, 'cancelAdminEventAttendance'])->name('admin.events.cancel');
+    
+    // Company pages (for viewing admin-created companies)
+    Route::get('/company/{id}', [CompanyController::class, 'showCompany'])->name('company.show');
+    
+    // Global search
+    Route::get('/search', [SearchController::class, 'search'])->name('search');
+    
+    // API endpoint for company search (used by dropdown)
+    Route::get('/api/companies/search', [SearchController::class, 'searchCompanies'])->name('api.companies.search');
 });
  
 // Chat routes (protected - requires authentication)
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth:web,pengguna,admin_user'])->group(function () {
     Route::get('/chats', [ChatController::class, 'index'])->name('chats');
     Route::get('/chats/{user}', [ChatController::class, 'show'])->name('chats.show');
     Route::post('/chats', [ChatController::class, 'store'])->name('chats.store');
@@ -117,20 +161,14 @@ Route::get('/AI', function () {
     return view('AI');
 })->name('AI');
 
-// (testing) halaman bestpartner
-Route::get('/bestpartnerjob', function () {
-    return view('bestpartnerjob');
-})->name('bestpartnerjob');
-
-// bestpartner page
-Route::get('/bestpartner', function () {
-    return view('bestpartner');
-})->name('bestpartner');
-
-// about bestpartner page
+// Best Partner specific pages
 Route::get('/aboutbestpartner', function () {
     return view('aboutbestpartner');
 })->name('aboutbestpartner');
+
+Route::get('/bestpartnerjob', function () {
+    return view('bestpartnerjob');
+})->name('bestpartnerjob');
 
 // (testing) halaman admin user add
 Route::get('/adminuseradd', function () {
@@ -181,6 +219,13 @@ Route::post('/login', [LoginController::class, 'processLogin'])->name('login.pos
 
 Route::post('/register', [UserRegistrationController::class, 'register'])->name('register.post');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+// Forgot Password Routes
+Route::get('/forgot-password', [App\Http\Controllers\ForgotPasswordController::class, 'showForgotForm'])->name('password.request');
+Route::post('/forgot-password', [App\Http\Controllers\ForgotPasswordController::class, 'sendResetLink'])->name('password.email');
+Route::get('/reset-password/{token}', [App\Http\Controllers\ForgotPasswordController::class, 'showResetForm'])->name('password.reset');
+Route::post('/reset-password', [App\Http\Controllers\ForgotPasswordController::class, 'resetPassword'])->name('password.update');
+
 
 
 // Protected routes
@@ -259,6 +304,43 @@ Route::middleware(['auth', 'is_admin'])->prefix('admin')->name('admin.')->group(
     Route::delete('/users/{id}', [AdminController::class, 'deleteUser'])->name('users.delete');
     Route::delete('/events/{id}', [AdminController::class, 'deleteEvent'])->name('events.delete');
 });
+
+// Admin Routes - New naming convention (matches blade file route names)
+// Dashboard
+Route::get('/AdminDashboard', [AdminController::class, 'index'])->middleware(['auth', 'is_admin'])->name('AdminDashboard');
+
+// Users
+Route::get('/AdminUserDatabase', [AdminController::class, 'users'])->middleware(['auth', 'is_admin'])->name('AdminUserDatabase');
+Route::get('/adminuseradd', [AdminController::class, 'showUserAddForm'])->middleware(['auth', 'is_admin'])->name('adminuseradd');
+Route::post('/adminuseradd', [AdminController::class, 'storeUser'])->name('adminuseradd.store'); // TEMPORARILY REMOVED MIDDLEWARE FOR TESTING
+Route::get('/adminuseredit/{id}', [AdminController::class, 'showUserEditForm'])->middleware(['auth', 'is_admin'])->name('adminuseredit');
+Route::put('/adminuseredit/{id}', [AdminController::class, 'updateUser'])->middleware(['auth', 'is_admin'])->name('adminuseredit.update');
+Route::delete('/adminuserdelete/{id}', [AdminController::class, 'deleteUser'])->middleware(['auth', 'is_admin'])->name('adminuserdelete');
+
+// Jobs
+Route::get('/AdminJobDatabase', [AdminController::class, 'jobs'])->middleware(['auth', 'is_admin'])->name('AdminJobDatabase');
+Route::get('/adminjobadd', [AdminController::class, 'showJobAddForm'])->middleware(['auth', 'is_admin'])->name('adminjobadd');
+Route::post('/adminjobadd', [AdminController::class, 'storeJob'])->middleware(['auth', 'is_admin'])->name('adminjobadd.store');
+Route::get('/adminjobedit/{id}', [AdminController::class, 'showJobEditForm'])->middleware(['auth', 'is_admin'])->name('adminjobedit');
+Route::put('/adminjobedit/{id}', [AdminController::class, 'updateJob'])->middleware(['auth', 'is_admin'])->name('adminjobedit.update');
+Route::delete('/adminjobdelete/{id}', [AdminController::class, 'deleteJob'])->middleware(['auth', 'is_admin'])->name('adminjobdelete');
+
+// Events
+Route::get('/AdminEventDatabase', [AdminController::class, 'events'])->middleware(['auth', 'is_admin'])->name('AdminEventDatabase');
+Route::get('/admineventadd', [AdminController::class, 'showEventAddForm'])->middleware(['auth', 'is_admin'])->name('admineventadd');
+Route::post('/admineventadd', [AdminController::class, 'storeEvent'])->middleware(['auth', 'is_admin'])->name('admineventadd.store');
+Route::get('/admineventedit/{id}', [AdminController::class, 'showEventEditForm'])->middleware(['auth', 'is_admin'])->name('admineventedit');
+Route::put('/admineventedit/{id}', [AdminController::class, 'updateEvent'])->middleware(['auth', 'is_admin'])->name('admineventedit.update');
+Route::delete('/admineventdelete/{id}', [AdminController::class, 'deleteEvent'])->middleware(['auth', 'is_admin'])->name('admineventdelete');
+
+// Companies
+Route::get('/AdminCompanyDatabase', [AdminController::class, 'companies'])->middleware(['auth', 'is_admin'])->name('AdminCompanyDatabase');
+Route::get('/admincompanyadd', [AdminController::class, 'showCompanyAddForm'])->middleware(['auth', 'is_admin'])->name('admincompanyadd');
+Route::post('/admincompanyadd', [AdminController::class, 'storeCompany'])->middleware(['auth', 'is_admin'])->name('admincompanyadd.store');
+Route::get('/admincompanyedit/{id}', [AdminController::class, 'showCompanyEditForm'])->middleware(['auth', 'is_admin'])->name('admincompanyedit');
+Route::put('/admincompanyedit/{id}', [AdminController::class, 'updateCompany'])->middleware(['auth', 'is_admin'])->name('admincompanyedit.update');
+Route::delete('/admincompanydelete/{id}', [AdminController::class, 'deleteCompany'])->middleware(['auth', 'is_admin'])->name('admincompanydelete');
+
 
 // Debug routes
 if (config('app.debug')) {
