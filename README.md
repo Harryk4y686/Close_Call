@@ -293,6 +293,15 @@ lowongan_kerja
 
 Semua data yang dibutuhkan dapat diakses di sana.
 
+
+---
+
+### 🛡️ Admin Access Setup
+Untuk masuk ke halaman admin:
+1. Tambahkan data user baru di tabel **users** melalui phpMyAdmin.
+2. Set kolom **is_admin** menjadi **1** (int).
+3. Login menggunakan akun tersebut untuk akses halaman admin.
+
 ## 👥 Contributors
 ### Fidelyn Adeo Gratia - UI/UX Designer
 ### Grant Savero - BackEnd Developer
