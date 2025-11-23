@@ -33,7 +33,7 @@ Aplikasi yang akan dibangun merupakan platform pencarian kerja yang mempertemuka
 - Git untuk kolaborasi pengembangan.
 
 ## Penjelasan lebih lengkap tentang fitur:
-**1. Login
+# 1. Login
 Terdapat kolom input email or phone untuk memasukkan email dan terdapat kolom input password untuk memasukkan password. Kemudian terdapat tombol login untuk konfirmasi menggunakan akun tersebut dan juga tombol Sign up bagi yang belum memiliki akun yang akan mengarahkan user ke halaman registrasi
 
 # 2. Register
