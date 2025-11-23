@@ -664,7 +664,7 @@ public function storeEvent(Request $request)
             ->where('user_id', $user->id)
             ->exists();
         
-        return view('ViewAdminEvent', compact('event', 'user', 'profile', 'isAttending'));
+        return view('viewAdminEvent', compact('event', 'user', 'profile', 'isAttending'));
     }
     
     /**

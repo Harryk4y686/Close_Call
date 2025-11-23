@@ -25,7 +25,7 @@ require __DIR__.'/debug-users.php';
 
 // halaman home/landing page tanpa akun
 Route::get('/', function () {
-    return view('LandingPage');
+    return view('landingPage');
 })->name('landingpage');
 
 // halaman home/landing page dengan akun (protected route - requires authentication and verification)
@@ -79,7 +79,7 @@ Route::delete('/jobs/{id}', function ($id) {
 
 // Jobs Categories page (protected - requires authentication and verification)
 Route::get('/jobs/categories', function () {
-    return view('JobsCategories');
+    return view('jobsCategories');
 })->middleware(['auth:web,pengguna,admin_user'])->name('jobs.categories');
 
 // Jobs Opened page (protected - requires authentication and verification)
@@ -93,7 +93,7 @@ Route::get('/jobs/opened', function () {
     // Fetch all admin jobs for display
     $jobs = \App\Models\AdminJob::latest()->get();
     
-    return view('JobsOpened', compact('jobs', 'user', 'profile'));
+    return view('jobsOpened', compact('jobs', 'user', 'profile'));
 })->middleware(['auth:web,pengguna,admin_user'])->name('jobs.opened');
  
 // Events routes (protected - requires authentication)
@@ -163,11 +163,11 @@ Route::get('/AI', function () {
 
 // Best Partner specific pages
 Route::get('/aboutbestpartner', function () {
-    return view('aboutbestpartner');
+    return view('aboutBestPartner');
 })->name('aboutbestpartner');
 
 Route::get('/bestpartnerjob', function () {
-    return view('bestpartnerjob');
+    return view('bestPartnerJob');
 })->name('bestpartnerjob');
 
 // (testing) halaman admin user add

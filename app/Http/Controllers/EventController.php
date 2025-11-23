@@ -79,7 +79,7 @@ class EventController extends Controller
     {
         $user = $this->getAuthUser();
         $profile = $user->registeredProfile;
-        return view('createevent', compact('user', 'profile'));
+        return view('createEvent', compact('user', 'profile'));
     }
 
     /**
@@ -187,7 +187,7 @@ class EventController extends Controller
         // Get user profile for header display
         $profile = $user->registeredProfile;
         
-        return view('viewevent', compact('event', 'isAttending', 'user', 'profile'));
+        return view('viewEvent', compact('event', 'isAttending', 'user', 'profile'));
     }
 
     /**
@@ -198,7 +198,7 @@ class EventController extends Controller
         $user = $this->getAuthUser();
         $event = Event::where('user_id', $user->id)->findOrFail($id);
         $profile = $user->registeredProfile;
-        return view('editevents', compact('event', 'user', 'profile'));
+        return view('editEvents', compact('event', 'user', 'profile'));
     }
 
     /**
