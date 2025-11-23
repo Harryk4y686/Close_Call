@@ -276,6 +276,23 @@ Terdapat tombol aksi utama di bagian bawah:
 # 17. Admin Page - Dashboard
 Pada dashboard, seorang admin pertama melihat sambutan dari CloseCall, serta tanggal hari ini. Di bawahnya, terdapat opsi log out. Selain itu, terdapat beberapa ringkasan dari masing-masing databases, yaitu total users, total jobs, total events, dan total companies. Terdapat juga quick actions, di mana admin dapat langsung mengakses database masing-masing yang ada. Di bagian sidebar, admin dapat menjangkau semua database yang ada dalam CloseCall.
 
+# Setup Database
+# 📝 Database Setup Notes
+
+Untuk setup database:
+
+```bash
+php artisan migrate:fresh
+```
+
+Setelah itu, buka **localhost/phpmyadmin** dan gunakan database:
+
+```
+lowongan_kerja
+```
+
+Semua data yang dibutuhkan dapat diakses di sana.
+
 ## 👥 Contributors
 ### Fidelyn Adeo Gratia - UI/UX Designer
 ### Grant Savero - BackEnd Developer
