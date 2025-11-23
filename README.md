@@ -238,8 +238,8 @@ Nama acara yang akan ditampilkan kepada pengguna.
 Tanggal dimulainya event (format tanggal sesuai sistem).  
 • Location  
 Negara tempat diselenggarakannya event.  
-• Attendees  
-Jumlah peserta yang akan atau dapat menghadiri event.  
+• Event Time 
+Waktu Event tersebut dimulai.  
 • About  
 Deskripsi singkat mengenai acara, seperti tujuan, penjelasan, atau informasi detail terkait event.  
 ________________________________________  
